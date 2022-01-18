@@ -79,7 +79,13 @@ def parse(filename):
 
 
 def parse_tuple(field):
-    return tuple(map(int, field.split(",")))
+    if field is None:
+        return None
+
+    try:
+        return tuple(map(int, field.split(",")))
+    except ValueError:
+        return tuple(map(float, field.split(",")))
 
 
 def infer_max_face_shape(chunk_shape):
