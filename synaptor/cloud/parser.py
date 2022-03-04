@@ -79,15 +79,20 @@ def parse(filename):
 
 
 def parse_tuple(field):
-    return tuple(map(int, field.split(",")))
+    """Parses a tuple of ints from a config field."""
+    if field is not None:  # some field defaults are None
+        return tuple(map(int, field.split(",")))
+    else:
+        return None
 
 
 def infer_max_face_shape(chunk_shape):
+    """Finds the face with the largest memory requirement."""
     return tuple(sorted(chunk_shape)[1:])
 
 
 def get_storagestrs(parser):
-    """ Extracts the storage strings depending upon the workspace type. """
+    """Extracts the storage strings depending upon the workspace type."""
     workspacetype = parser.get("Workflow", "workspacetype")
 
     if workspacetype == "Database":
