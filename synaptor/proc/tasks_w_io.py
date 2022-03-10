@@ -5,6 +5,7 @@ platform (AWS S3 or Google Cloud Storage) or (2) a Postgres database for
 storing intermediate data.
 """
 import time
+import signal
 
 from taskqueue import queueable
 
@@ -986,3 +987,11 @@ def fixsegids_task(
         chunk_bounds,
         tablename="corrupted_chunk_edges",
     )
+
+
+@queueable
+def self_destruct():
+    """Signals to taskqueue that all tasks are complete."""
+    # taskqueue interprets SIGINT as a signal to exit after this task completes, and it
+    # will still delete this task from the queue despite the signal.
+    signal.raise_signal(signal.SIGINT)

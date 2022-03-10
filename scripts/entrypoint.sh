@@ -54,6 +54,7 @@ case $1 in
             create_index)     python3 -u generation/create_index.py ${@:2} ;;
             dedup_chunk_segs) python3 -u generation/dedup_chunk_segs.py ${@:2} ;;
             init_db)          python3 -u generation/init_db.py ${@:2} ;;
+            self_destruct)    python3 -u generation/self_destruct.py ${@:2} ;;
             *)  echo "invalid task name: $2"; false
 	esac
     ;;

@@ -62,3 +62,13 @@ def test_create_remap(filequeue):
     assert len(it) == 8
 
     run_insertion_test(it, filequeue)
+
+
+def test_create_self_destruct(filequeue):
+    """Checks whether create_self_destruct_tasks runs."""
+    it = task_creation.create_self_destruct_tasks(100)
+
+    assert isinstance(next(iter(it)), partial)
+    assert len(it) == 100
+
+    run_insertion_test(it, filequeue)

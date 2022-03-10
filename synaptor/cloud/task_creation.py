@@ -31,7 +31,7 @@ def create_connected_component_tasks(
     hashmax: int = 1,
     bboxes: list[Bbox] = None,
 ) -> Iterable:
-    """Returns a generator of partial cc_tasks."""
+    """Returns a iterator of partial cc_tasks."""
     print(bboxes)
     if bboxes is None:
         bboxes = chunk_bboxes(volshape, chunkshape, offset=startcoord)
@@ -293,7 +293,7 @@ def create_remap_tasks(
     resolution: tuple[int, int, int] = (8, 8, 40),
     parallel: int = 1,
 ) -> Iterable:
-    """Returns a generator of partial remap_ids_tasks."""
+    """Returns a iterator of partial remap_ids_tasks."""
     dup_map_storagestr = (
         storagestr if dup_map_storagestr is None else dup_map_storagestr
     )
@@ -391,3 +391,20 @@ def create_cloudvols(
             offset=startcoord,
             chunk_size=block_shape,
         )
+
+
+def create_self_destruct_tasks(numworkers):
+    """Returns an iterator of self_destruct tasks."""
+
+    class SelfDestructIterator:
+        def __init__(self):
+            pass
+
+        def __len__(self):
+            return numworkers
+
+        def __iter__(self):
+            for i in range(numworkers):
+                yield partial(tasks_w_io.self_destruct)
+
+    return SelfDestructIterator()
