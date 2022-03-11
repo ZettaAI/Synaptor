@@ -14,7 +14,7 @@ HOME = os.path.expanduser("~")
 print(HOME)
 try:
     print("secrets?")
-    print(glob.glob("/root/.cloudvolume/secrets/*")
+    print(glob.glob("/root/.cloudvolume/secrets/*"))
 except:
     pass
 
