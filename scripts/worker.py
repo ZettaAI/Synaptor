@@ -5,7 +5,7 @@ Accepts tasks from a queue until it receives a kill task signal.
 import argparse
 from taskqueue import TaskQueue
 
-import synaptor.proc.io.tasks_w_io  # "Registers" tasks for taskqueue
+import synaptor.proc.tasks_w_io  # "Registers" tasks for taskqueue
 from synaptor.cloud import parser
 
 
