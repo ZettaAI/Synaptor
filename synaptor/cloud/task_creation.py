@@ -393,7 +393,7 @@ def create_cloudvols(
         )
 
 
-def create_self_destruct_tasks(numworkers):
+def create_self_destruct_tasks(numworkers: int) -> Iterable:
     """Returns an iterator of self_destruct tasks."""
 
     class SelfDestructIterator:
