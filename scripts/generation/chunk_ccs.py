@@ -7,6 +7,10 @@ import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 from synaptor import io
 
+# DEBUGGING: making sure that home is where I expect
+import os
+HOME = os.path.expanduser("~")
+print(HOME)
 
 def main(configfilename, tagfilename=None):
 
