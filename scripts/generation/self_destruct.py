@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Generation script for self_destruct tasks."""
 from __future__ import annotations
 
@@ -6,6 +7,7 @@ import argparse
 from taskqueue import TaskQueue
 
 import synaptor.cloud.task_creation as tc
+import synaptor.cloud.parser as parser
 
 
 def main(configfilename: str) -> None:
@@ -24,4 +26,4 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    main(args.configfilename, args.numworkers)
+    main(args.configfilename)

@@ -4,7 +4,7 @@ import argparse
 from taskqueue import TaskQueue
 
 import synaptor.cloud.parser as parser
-import synaptor.cloud.kube.task_creation as tc
+import synaptor.cloud.task_creation as tc
 from synaptor import io
 
 
