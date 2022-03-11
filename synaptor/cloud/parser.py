@@ -63,6 +63,7 @@ def parse(filename):
     conf["normcloudpath"] = parser.get(
                                 "Workflow", "normcloudpath", fallback=None)
     conf["storagestrs"] = get_storagestrs(parser)
+    conf["maxclustersize"] = parser.getint("Workflow", "maxclustersize")
 
     # [Remapped segmentation]
     conf["aggscratchpath"] = parser.get(
