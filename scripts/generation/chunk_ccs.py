@@ -1,4 +1,5 @@
 """Task generation script for chunk connected components."""
+import os
 import argparse
 
 from taskqueue import TaskQueue
@@ -7,6 +8,12 @@ import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 from synaptor import io
 
+# DEBUG: make sure that the file content has the same length
+def filelength(filename):
+    with open(filename) as f:
+        print(len(f.read()))
+filelength(os.path.join(os.path.expanduser("~"), ".cloudvolume/secrets/aws-secret.json"))
+filelength(os.path.join(os.path.expanduser("~"), ".cloudvolume/secrets/google-secret.json"))
 
 def main(configfilename, tagfilename=None):
 
