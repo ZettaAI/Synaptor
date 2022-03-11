@@ -1,4 +1,6 @@
 """Generation script for self_destruct tasks."""
+from __future__ import annotations
+
 import argparse
 
 from taskqueue import TaskQueue

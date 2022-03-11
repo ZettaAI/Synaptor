@@ -4,6 +4,8 @@ These use seung-lab/CloudVolume, and either (1) a file-based cloud-storage
 platform (AWS S3 or Google Cloud Storage) or (2) a Postgres database for
 storing intermediate data.
 """
+from __future__ import annotations
+
 import time
 import signal
 
