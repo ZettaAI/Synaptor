@@ -7,8 +7,6 @@ import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 from synaptor import io
 
-# DEBUGGING: seeing whether the variable contents are mounted correctly
-print(subprocess.check_output["sha256sum", "/root/.cloudvolume/secrets/aws_secret.json"])
 
 def main(configfilename, tagfilename=None):
 
