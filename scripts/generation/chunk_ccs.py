@@ -9,8 +9,14 @@ from synaptor import io
 
 # DEBUGGING: making sure that home is where I expect
 import os
+import glob
 HOME = os.path.expanduser("~")
 print(HOME)
+try:
+    print("secrets?")
+    print(glob.glob("/root/.cloudvolume/secrets/*")
+except:
+    pass
 
 def main(configfilename, tagfilename=None):
 
