@@ -7,6 +7,7 @@ from taskqueue import TaskQueue
 
 import synaptor.proc.tasks_w_io  # "Registers" tasks for taskqueue
 from synaptor.cloud import parser
+from synaptor.cloud import boto
 
 
 def main(queueurl, configfilename, lease_seconds):
@@ -32,5 +33,8 @@ if __name__ == "__main__":
     ap.add_argument("--lease_seconds", type=int, default=300)
 
     args = ap.parse_args()
+
+    if not boto.gcloud_configured():
+        boto.writeboto()
 
     main(**vars(args))

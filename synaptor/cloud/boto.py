@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 import json
+import subprocess
 from textwrap import dedent
 from collections import namedtuple
 
@@ -15,6 +16,19 @@ HOME = os.path.expanduser("~")
 AWSPATH = os.path.join(HOME, ".cloudvolume/secrets", "aws-secret.json")
 GCPPATH = os.path.join(HOME, ".cloudvolume/secrets", "google-secret.json")
 BOTOPATH = os.path.join(HOME, ".boto")
+
+
+def gcloud_configured():
+    """Tests whether gcloud permissions are set by trying gsutil."""
+    projectid = read_gcp_project()
+
+    cmd = "gsutil ls"
+    if projectid is not None:
+        cmd += f" -p {projectid}"
+
+    status, _ = subprocess.getstatusoutput(cmd)
+
+    return status == 0
 
 
 def writeboto() -> None:
