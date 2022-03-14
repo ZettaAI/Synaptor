@@ -1,7 +1,7 @@
 import argparse
 
-import synaptor.cloud.kube.parser as parser
-import synaptor.cloud.kube.task_creation as tc
+import synaptor.cloud.parser as parser
+import synaptor.cloud.task_creation as tc
 
 
 def main(configfilename):
