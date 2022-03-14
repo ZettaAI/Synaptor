@@ -6,6 +6,7 @@ storing intermediate data.
 """
 from __future__ import annotations
 
+import os
 import time
 import signal
 
@@ -999,4 +1000,5 @@ def self_destruct():
 
     # This version isn't compliant with python 3.7
     # signal.raise_signal(signal.SIGINT)
-    raise KeyboardInterrupt
+    print("SELF-DESTRUCT TASK RECEIVED")
+    os.kill(os.getpid(), signal.SIGINT)
