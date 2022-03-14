@@ -996,4 +996,7 @@ def self_destruct():
     """Signals to taskqueue that all tasks are complete."""
     # taskqueue interprets SIGINT as a signal to exit after this task completes, and it
     # will still delete this task from the queue despite the signal.
-    signal.raise_signal(signal.SIGINT)
+
+    # This version isn't compliant with python 3.7
+    # signal.raise_signal(signal.SIGINT)
+    raise KeyboardInterrupt
