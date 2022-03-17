@@ -3,30 +3,56 @@
 Accepts tasks from a queue until it receives a kill task signal.
 """
 import argparse
+from typing import Optional
+
 from taskqueue import TaskQueue
+from kombuworker import taskqueueworker as tqw
 
 import synaptor.proc.tasks_w_io  # "Registers" tasks for taskqueue
 from synaptor.cloud import parser
 from synaptor.cloud import boto
 
 
-def main(queueurl, configfilename, lease_seconds):
+def main(
+    configfilename: Optional[str] = None,
+    queueurl: Optional[str] = None,
+    queuename: Optional[str] = None,
+    lease_seconds: int = 300,
+) -> None:
+    queueurl = parse_opt_if_not_passed("queueurl", queueurl, configfilename)
 
-    if configfilename is not None:
-        queueurl = parser.parse(configfilename)["queueurl"]
-    elif queueurl is not None:
-        pass
+    if queueurl.startswith("amqp://"):
+        # also need a queue name within the amqp server
+        queuename = parse_opt_if_not_passed("queuename", queuename, configfilename)
+
+        print("Starting polling")
+        tqw.poll(queueurl, queuename, max_num_retries=10_000, verbose=True)
+
     else:
-        raise Exception("Need to define queueurl or configfilename")
+        with TaskQueue(qurl=queueurl, n_threads=0) as tq:
+            print("Starting polling")
+            tq.poll(lease_seconds=lease_seconds)
 
-    with TaskQueue(qurl=queueurl, n_threads=0) as tq:
-        tq.poll(lease_seconds=lease_seconds)
+
+def parse_opt_if_not_passed(
+    optname: str, opt: Optional[str] = None, configfilename: Optional[str] = None
+) -> str:
+    """Parses an option from the configuration file if it's not passed on the command line."""
+    if opt is not None:
+        return opt
+
+    else:
+        if configfilename is None:
+            raise ValueError(f"Need to pass {optname} or configfilename")
+
+        return parser.parse(configfilename)[optname]
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
 
     ap.add_argument("--queueurl", type=str, default=None, help="queue URL")
+    ap.add_argument("--queuename", type=str, default=None, help="queue name (AMQP)")
     ap.add_argument(
         "--configfilename", type=str, default=None, help="configuration file"
     )

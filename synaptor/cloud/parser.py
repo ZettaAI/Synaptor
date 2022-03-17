@@ -56,6 +56,7 @@ def parse(filename):
     conf["workspacetype"] = parser.get(
                                 "Workflow", "workspacetype", fallback="File")
     conf["queueurl"] = parser.get("Workflow", "queueurl", fallback=None)
+    conf["queuename"] = parser.get("Workflow", "queuename", fallback=None)
     conf["connectionstr"] = parser.get(
                                 "Workflow", "connectionstr",
                                 fallback="STORAGE_FROM_FILE")

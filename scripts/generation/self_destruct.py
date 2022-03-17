@@ -1,10 +1,10 @@
-#!/usr/bin/env python
 """Generation script for self_destruct tasks."""
 from __future__ import annotations
 
 import argparse
 
 from taskqueue import TaskQueue
+from kombuworker import taskqueueworker as tqw
 
 import synaptor.cloud.task_creation as tc
 import synaptor.cloud.parser as parser
@@ -15,8 +15,15 @@ def main(configfilename: str) -> None:
 
     iterator = tc.create_self_destruct_tasks(config["maxclustersize"])
 
-    tq = TaskQueue(config["queueurl"])
-    tq.insert_all(iterator)
+    if config["queueurl"].startswith("amqp://"):
+        queueurl = config["queueurl"]
+        queuename = config["queuename"]
+
+        tqw.insert_tasks(queueurl, queuename, iterator)
+
+    else:
+        tq = TaskQueue(config["queueurl"])
+        tq.insert_all(iterator)
 
 
 if __name__ == "__main__":

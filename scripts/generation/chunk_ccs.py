@@ -1,21 +1,19 @@
 """Task generation script for chunk connected components."""
+from __future__ import annotations
+
 import os
 import argparse
+from typing import Optional
 
 from taskqueue import TaskQueue
+from kombuworker import taskqueueworker as tqw
 
 import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 from synaptor import io
 
-# DEBUG: make sure that the file content has the same length
-def filelength(filename):
-    with open(filename) as f:
-        print(len(f.read()))
-filelength(os.path.join(os.path.expanduser("~"), ".cloudvolume/secrets/aws-secret.json"))
-filelength(os.path.join(os.path.expanduser("~"), ".cloudvolume/secrets/google-secret.json"))
 
-def main(configfilename, tagfilename=None):
+def main(configfilename: str, tagfilename: Optional[str] = None) -> None:
 
     config = parser.parse(configfilename)
 
@@ -39,8 +37,15 @@ def main(configfilename, tagfilename=None):
         bboxes=bboxes,
     )
 
-    tq = TaskQueue(config["queueurl"])
-    tq.insert_all(iterator)
+    if config["queueurl"].startswith("amqp://"):
+        queueurl = config["queueurl"]
+        queuename = config["queuename"]
+
+        tqw.insert_tasks(queueurl, queuename, iterator)
+
+    else:
+        tq = TaskQueue(config["queueurl"])
+        tq.insert_all(iterator)
 
 
 if __name__ == "__main__":
