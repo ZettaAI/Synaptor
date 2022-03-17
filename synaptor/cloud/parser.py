@@ -1,4 +1,5 @@
 import configparser
+from typing import Optional
 
 
 SUPPORTED_WORKFLOWS = ["Segmentation", "Segmentation+Assignment"]
@@ -115,3 +116,17 @@ def check_shapes(volshape, chunkshape, blockshape):
         raise Exception("volshape not evenly divided by blockshape")
     if not all(c % b == 0 for (c, b) in zip(chunkshape, blockshape)):
         raise Exception("chunkshape not evenly divided by blockshape")
+
+
+def parse_opt_if_not_passed(
+    optname: str, opt: Optional[str] = None, configfilename: Optional[str] = None
+) -> str:
+    """Parses an option from the configuration file if it's not passed on the command line."""
+    if opt is not None:
+        return opt
+
+    else:
+        if configfilename is None:
+            raise ValueError(f"Need to pass {optname} or configfilename")
+
+        return parse(configfilename)[optname]

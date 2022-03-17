@@ -1,7 +1,6 @@
 """Task generation script for chunk connected components."""
 from __future__ import annotations
 
-import os
 import argparse
 from typing import Optional
 
@@ -13,7 +12,12 @@ import synaptor.cloud.task_creation as tc
 from synaptor import io
 
 
-def main(configfilename: str, tagfilename: Optional[str] = None) -> None:
+def main(
+    configfilename: str,
+    queueurl: Optional[str] = None,
+    queuename: Optional[str] = None,
+    tagfilename: Optional[str] = None,
+) -> None:
 
     config = parser.parse(configfilename)
 
@@ -37,23 +41,25 @@ def main(configfilename: str, tagfilename: Optional[str] = None) -> None:
         bboxes=bboxes,
     )
 
-    if config["queueurl"].startswith("amqp://"):
-        queueurl = config["queueurl"]
-        queuename = config["queuename"]
+    queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)
+    queuename = parser.parse_opt_if_not_passed("queuename", queuename, configfilename)
 
+    if queueurl.startswith("amqp://"):
         tqw.insert_tasks(queueurl, queuename, iterator)
 
     else:
-        tq = TaskQueue(config["queueurl"])
+        tq = TaskQueue(queueurl)
         tq.insert_all(iterator)
 
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser()
 
-    argparser.add_argument("configfilename")
-    argparser.add_argument("--tagfilename", default=None)
+    ap.add_argument("configfilename", type=str, help="configuration file")
+    ap.add_argument("--queueurl", type=str, default=None, help="queue URL")
+    ap.add_argument("--queuename", type=str, default=None, help="queue name (AMQP)")
+    ap.add_argument("--tagfilename", default=None)
 
-    args = argparser.parse_args()
+    args = ap.parse_args()
 
-    main(args.configfilename, args.tagfilename)
+    main(args.configfilename, args.queueurl, args.queuename, args.tagfilename)

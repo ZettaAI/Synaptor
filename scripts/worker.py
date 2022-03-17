@@ -8,7 +8,8 @@ from typing import Optional
 from taskqueue import TaskQueue
 from kombuworker import taskqueueworker as tqw
 
-import synaptor.proc.tasks_w_io  # "Registers" tasks for taskqueue
+# Registers tasks for taskqueue
+import synaptor.proc.tasks_w_io  # noqa
 from synaptor.cloud import parser
 from synaptor.cloud import boto
 
@@ -19,11 +20,13 @@ def main(
     queuename: Optional[str] = None,
     lease_seconds: int = 300,
 ) -> None:
-    queueurl = parse_opt_if_not_passed("queueurl", queueurl, configfilename)
+    queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)
 
     if queueurl.startswith("amqp://"):
         # also need a queue name within the amqp server
-        queuename = parse_opt_if_not_passed("queuename", queuename, configfilename)
+        queuename = parser.parse_opt_if_not_passed(
+            "queuename", queuename, configfilename
+        )
 
         print("Starting polling")
         tqw.poll(queueurl, queuename, max_num_retries=10_000, verbose=True)
@@ -32,20 +35,6 @@ def main(
         with TaskQueue(qurl=queueurl, n_threads=0) as tq:
             print("Starting polling")
             tq.poll(lease_seconds=lease_seconds)
-
-
-def parse_opt_if_not_passed(
-    optname: str, opt: Optional[str] = None, configfilename: Optional[str] = None
-) -> str:
-    """Parses an option from the configuration file if it's not passed on the command line."""
-    if opt is not None:
-        return opt
-
-    else:
-        if configfilename is None:
-            raise ValueError(f"Need to pass {optname} or configfilename")
-
-        return parser.parse(configfilename)[optname]
 
 
 if __name__ == "__main__":
