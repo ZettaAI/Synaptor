@@ -1,11 +1,13 @@
-__doc__ = """
-Base IO functions - wrap around cloud backends and local IO
+"""Base IO functions - wraps around cloud backends and local IO
 
 Nicholas Turner <nturner@cs.princeton.edu>, 2018
 """
 
 import os
 import warnings
+from functools import wraps
+
+from taskqueue import queueable
 
 from . import backends as bck
 from . import utils
@@ -296,7 +298,11 @@ read_db_dframe = bck.sqlalchemy.read_dframe
 write_db_dframe = bck.sqlalchemy.write_dframe_copy_from
 read_db_dframes = bck.sqlalchemy.read_dframes
 write_db_dframes = bck.sqlalchemy.write_dframes_copy_from
-create_index = bck.sqlalchemy.create_index
+
+@queueable
+@wraps(bck.sqlalchemy.create_index)
+def create_index(*args, **kwargs):
+    return bck.sqlalchemy.create_index(*args, **kwargs)
 
 
 def is_remote_path(uri):
