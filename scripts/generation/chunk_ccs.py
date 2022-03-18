@@ -55,11 +55,11 @@ def main(
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
 
-    ap.add_argument("configfilename", type=str, help="configuration file")
+    ap.add_argument("configfilename", type=str, help="Path to the configuration file")
     ap.add_argument("--queueurl", type=str, default=None, help="queue URL")
     ap.add_argument("--queuename", type=str, default=None, help="queue name (AMQP)")
     ap.add_argument("--tagfilename", default=None)
 
     args = ap.parse_args()
 
-    main(args.configfilename, args.queueurl, args.queuename, args.tagfilename)
+    main(**vars(args))

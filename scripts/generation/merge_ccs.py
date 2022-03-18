@@ -1,29 +1,46 @@
+"""Task generation script for the merge_ccs task."""
+from __future__ import annotations
+
 import argparse
+from typing import Optional
 
 from taskqueue import TaskQueue
+from kombuworker import taskqueueworker as tqw
 
-import synaptor.cloud.kube.parser as parser
-import synaptor.cloud.kube.task_creation as tc
+import synaptor.cloud.parser as parser
+import synaptor.cloud.task_creation as tc
 
 
-def main(configfilename):
+def main(
+    configfilename: str,
+    queueurl: Optional[str] = None,
+    queuename: Optional[str] = None,
+) -> None:
 
     config = parser.parse(configfilename)
 
     task = tc.create_merge_ccs_task(
-               config["storagestrs"][0], config["szthresh"],
-               config["maxfaceshape"])
+        config["storagestrs"][0], config["szthresh"], config["maxfaceshape"]
+    )
 
-    tq = TaskQueue(config["queueurl"])
-    tq.insert_all([task])
+    queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)
+    queuename = parser.parse_opt_if_not_passed("queuename", queuename, configfilename)
+
+    if queueurl.startswith("amqp://"):
+        tqw.insert_tasks(queueurl, queuename, [task])
+
+    else:
+        tq = TaskQueue(queueurl)
+        tq.insert_all(iterator)
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
 
-    argparser = argparse.ArgumentParser()
+    ap.add_argument("configfilename", type=str, help="Path to the configuration file.")
+    ap.add_argument("--queueurl", type=str, default=None, help="queue URL.")
+    ap.add_argument("--queuename", type=str, default=None, help="queue name (AMQP).")
 
-    argparser.add_argument("configfilename")
+    args = ap.parse_args()
 
-    args = argparser.parse_args()
-
-    main(args.configfilename)
+    main(**vars(args))

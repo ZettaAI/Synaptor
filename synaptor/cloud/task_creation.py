@@ -81,16 +81,15 @@ def create_match_contins_tasks(
     storagestr: str, storagedir: str, hashmax: int, max_faceshape: tuple[int, int]
 ) -> Iterable:
     class MatchContinsTaskIterator(object):
-        def __init__(self, hashmax):
-            self.level_start = 0
-            self.level_end = hashmax
+        def __init__(self):
+            pass
 
         def __len__(self):
-            return self.level_end - self.level_start
+            return hashmax
 
         def __iter__(self):
             max_faceshape_str = tup2str(max_faceshape)
-            for i in range(self.level_start, self.level_end):
+            for i in range(hashmax):
                 cmd = (
                     f"match_contins {storagestr} {storagedir} {i} "
                     f" --max_face_shape {max_faceshape_str}"
@@ -318,11 +317,11 @@ def create_remap_tasks(
                     tasks_w_io.remap_ids_task,
                     seg_in_path,
                     seg_out_path,
-                    storagestr=storagestr,
                     chunk_begin=chunk_begin,
                     chunk_end=chunk_end,
+                    storagestr=storagestr,
                     dup_map_storagestr=dup_map_storagestr,
-                    mip=resolution,
+                    resolution=resolution,
                 )
 
     return RemapTaskIterator()

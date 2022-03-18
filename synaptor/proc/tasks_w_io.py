@@ -810,7 +810,7 @@ def remap_ids_task(
     chunk_end: tuple[int, int, int],
     storagestr: str,
     dup_map_storagestr: str = None,
-    mip: int = 0,
+    resolution: tuple[int, int, int] = 0,
     parallel: int = 1,
     timing_tag: str = None,
 ) -> None:
@@ -839,7 +839,7 @@ def remap_ids_task(
         io.read_cloud_volume_chunk,
         seg_in_cvname,
         chunk_bounds,
-        mip=mip,
+        mip=resolution,
         parallel=parallel,
     )
 
@@ -851,7 +851,7 @@ def remap_ids_task(
         seg,
         seg_out_cvname,
         chunk_bounds,
-        mip=mip,
+        mip=resolution,
         parallel=parallel,
     )
 
