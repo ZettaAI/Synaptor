@@ -21,7 +21,7 @@ case $1 in
     chunk_edges)      /usr/bin/env python -u chunk_edges.py ${@:2} ;;
     pick_edge)        /usr/bin/env python -u pick_edge.py ${@:2} ;;
     merge_dups)       /usr/bin/env python -u merge_dups.py ${@:2} ;;
-    remap_ids)        /usr/bin/env python -u remap_ids.py ${@:2} ;;
+    remap)            /usr/bin/env python -u remap.py ${@:2} ;;
     chunk_overlaps)   /usr/bin/env python -u chunk_overlaps.py ${@:2} ;;
     merge_overlaps)   /usr/bin/env python -u merge_overlaps.py ${@:2} ;;
     chunk_anchors)    /usr/bin/env python -u chunk_anchors.py ${@:2} ;;
@@ -47,7 +47,7 @@ case $1 in
             chunk_edges)      /usr/bin/env python -u generation/chunk_edges.py ${@:3} ;;
             pick_edge)        /usr/bin/env python -u generation/pick_edge.py ${@:3} ;;
             merge_dups)       /usr/bin/env python -u generation/merge_dups.py ${@:3} ;;
-            remap_ids)        /usr/bin/env python -u generation/remap_ids.py ${@:3} ;;
+            remap)            /usr/bin/env python -u generation/remap.py ${@:3} ;;
             chunk_overlaps)   /usr/bin/env python -u generation/chunk_overlaps.py ${@:3} ;;
             merge_overlaps)   /usr/bin/env python -u generation/merge_overlaps.py ${@:3} ;;
             chunk_anchors)    /usr/bin/env python -u generation/chunk_anchors.py ${@:3} ;;
