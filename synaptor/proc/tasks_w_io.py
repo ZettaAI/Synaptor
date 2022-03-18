@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import time
 import signal
+from typing import Optional
 
 from taskqueue import queueable
 
@@ -33,11 +34,11 @@ def cc_task(
     sz_thresh: int,
     chunk_begin: tuple[int, int, int],
     chunk_end: tuple[int, int, int],
-    mip: int = 0,
-    parallel: int = 1,
-    storagedir: str = None,
-    hashmax: int = 100,
-    timing_tag: str = None,
+    resolution: Optional[Union[tuple[int, int, int], int]] = 0,
+    parallel: Optional[int] = 1,
+    storagedir: Optional[str] = None,
+    hashmax: Optional[int] = 100,
+    timing_tag: Optional[str] = None,
 ) -> None:
     """Atomic connected components task with standard IO."""
     start_time = time.time()
@@ -73,7 +74,7 @@ def cc_task(
         io.read_cloud_volume_chunk,
         desc_cvname,
         chunk_bounds,
-        mip=mip,
+        mip=resolution,
         parallel=parallel,
     )
 
@@ -87,7 +88,7 @@ def cc_task(
         ccs,
         seg_cvname,
         chunk_bounds,
-        mip=mip,
+        mip=resolution,
         parallel=parallel,
     )
 
@@ -173,7 +174,7 @@ def merge_ccs_task(
     storagestr: str,
     size_thr: int,
     max_face_shape: tuple[int, int],
-    timing_tag: str = None,
+    timing_tag: Optional[str] = None,
 ) -> None:
     """Merging atomic connected component results without parallelism."""
     start_time = time.time()
@@ -220,8 +221,12 @@ def merge_ccs_task(
 
 
 def match_continuations_task(
-    storagestr, storagedir, facehash, max_face_shape=(1024, 1024), timing_tag=None
-):
+    storagestr: str,
+    storagedir: str,
+    facehash: int,
+    max_face_shape: Optional[tuple[int, int]] = (1024, 1024),
+    timing_tag: Optional[str] = None,
+) -> None:
 
     start_time = time.time()
 
@@ -296,7 +301,7 @@ def match_continuations_task(
         )
 
 
-def seg_graph_cc_task(storagestr, hashmax, timing_tag=None):
+def seg_graph_cc_task(storagestr: str, hashmax: int, timing_tag: Optional[str] = None) -> None:
 
     start_time = time.time()
 
@@ -323,7 +328,7 @@ def seg_graph_cc_task(storagestr, hashmax, timing_tag=None):
         )
 
 
-def chunk_seg_merge_map(storagestr, timing_tag=None):
+def chunk_seg_merge_map(storagestr: str, timing_tag: Optional[str] = None) -> None:
 
     start_time = time.time()
 
@@ -347,7 +352,11 @@ def chunk_seg_merge_map(storagestr, timing_tag=None):
 
 
 def merge_seginfo_task(
-    storagestr, hashval, szthresh=None, aux_storagestr=None, timing_tag=None
+    storagestr: str,
+    hashval: int,
+    szthresh: Optional[int] = None,
+    aux_storagestr: Optional[str] = None,
+    timing_tag: Optional[str] = None,
 ):
 
     start_time = time.time()

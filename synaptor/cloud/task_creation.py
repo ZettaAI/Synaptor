@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from functools import partial
-from typing import Iterable
+from typing import Iterable, Generator, Optional
 
 from cloudvolume.lib import Bbox
 from synaptor.proc import tasks_w_io
@@ -61,7 +61,7 @@ def create_connected_component_tasks(
                     chunk_end=chunk_end,
                     hashmax=hashmax,
                     parallel=parallel,
-                    mip=resolution,
+                    resolution=resolution,
                     storagedir=storagedir,
                 )
 
@@ -78,7 +78,7 @@ def create_merge_ccs_task(
 
 
 def create_match_contins_tasks(
-    storagestr: str, storagedir: str, hashmax: int, max_faceshape: tuple[int, int]
+    storagestr: str, storagedir: str, hashmax: int, max_face_shape: tuple[int, int]
 ) -> Iterable:
     class MatchContinsTaskIterator(object):
         def __init__(self):
@@ -88,69 +88,50 @@ def create_match_contins_tasks(
             return hashmax
 
         def __iter__(self):
-            max_faceshape_str = tup2str(max_faceshape)
             for i in range(hashmax):
-                cmd = (
-                    f"match_contins {storagestr} {storagedir} {i} "
-                    f" --max_face_shape {max_faceshape_str}"
-                )
+                yield partial(tasks_w_io.match_continuations_task,
+                          storagestr, storagedir, i, max_face_shape)
 
-                yield SynaptorTask(cmd)
-
-    return MatchContinsTaskIterator(hashmax)
+    return MatchContinsTaskIterator()
 
 
-def create_seg_graph_cc_task(storagestr, hashmax):
-    return SynaptorTask(f"seg_graph_ccs {storagestr} {hashmax}")
+def create_seg_graph_cc_task(storagestr: str, hashmax: int) -> partial:
+    return partial(tasks_w_io.seg_graph_ccs, storagestr, hashmax)
 
 
-def create_index_seg_map_task(storagestr):
-    return SynaptorTask(f"create_index {storagestr}" " seg_merge_map dst_id_hash")
+def create_index_seg_map_task(storagestr: str) -> partial:
+    return partial(io.create_index, storagestr, "seg_merge_map", "dst_id_hash")
 
 
-def create_chunk_seg_map_task(storagestr):
-    return SynaptorTask(f"chunk_seg_map {storagestr}")
+def create_chunk_seg_map_task(storagestr: str) -> partial:
+    return partial(tasks_w_io.chunk_seg_merge_map, storagestr)
 
 
-def create_index_chunked_seg_map_task(storagestr):
-    return SynaptorTask(f"create_index {storagestr}" " chunked_seg_merge_map chunk_tag")
+def create_index_chunked_seg_map_task(storagestr: str) -> partial:
+    return partial(io.create_index, storagestr, "chunked_seg_merge_map", "chunk_tag")
 
 
 def create_merge_seginfo_tasks(
-    storagestr, hashmax, aux_storagestr=None, szthresh=None, timingtag=None
-):
+        storagestr: str,
+        hashmax: int,
+        aux_storagestr: Optional[str] = None,
+        szthresh: Optional[int] = None,
+) -> Generator[partial, None, None]:
+
     class MergeSeginfoTaskIterator(object):
-        def __init__(self, storagestr, hashmax, aux_storagestr, szthresh):
-            self.level_start = 0
-            self.level_end = hashmax
-            self.storagestr = storagestr
-            self.aux_storagestr = aux_storagestr
-            self.szthresh = szthresh
+        def __init__(self):
+            pass
 
         def __len__(self):
-            return self.level_end - self.level_start
-
-        def __getitem__(self, slc):
-            itr = copy.deepcopy(self)
-            itr.level_start = self.level_start + slc.start
-            itr.level_end = self.level_start + slc.stop
-            return itr
+            return hashmax
 
         def __iter__(self):
-            if self.aux_storagestr is None:
-                aux_arg = ""
-            else:
-                aux_arg = f"--aux_storagestr {self.aux_storagestr}"
+            for i in range(hashmax):
+                yield partial(tasks_w_io.merge_seginfo_task,
+                        storagestr, i, szthresh=szthresh,
+                        aux_storagestr=aux_storagestr)
 
-            if self.szthresh is not None:
-                aux_arg += f" --szthresh {self.szthresh}"
-
-            for i in range(self.level_start, self.level_end):
-                cmd = f"merge_seginfo {self.storagestr} {i} {aux_arg}"
-
-                yield SynaptorTask(cmd)
-
-    return MergeSeginfoTaskIterator(storagestr, hashmax, aux_storagestr, szthresh)
+    return MergeSeginfoTaskIterator()
 
 
 def create_chunk_edges_tasks(
