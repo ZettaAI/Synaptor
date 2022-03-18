@@ -26,7 +26,7 @@ def main(
         volshape=config["volshape"],
         chunkshape=config["chunkshape"],
         startcoord=config["startcoord"],
-        dupstoragestr=config["storagestrs"][1],
+        dup_map_storagestr=config["storagestrs"][1],
         resolution=config["voxelres"],
     )
 
