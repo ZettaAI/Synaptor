@@ -5,7 +5,7 @@ from functools import partial
 from typing import Iterable, Generator, Optional
 
 from cloudvolume.lib import Bbox
-from synaptor.proc import tasks_w_io
+from synaptor.proc import tasks_w_io, io as procio
 from synaptor import io, chunk_bboxes
 
 
@@ -15,7 +15,7 @@ def tup2str(t):
 
 def create_init_db_task(storagestr: str) -> partial:
     """Wraps an init_db task in a partial fn."""
-    return partial(tasks_w_io.init_db, storagestr)
+    return partial(procio.init_db, storagestr)
 
 
 def create_connected_component_tasks(
@@ -78,25 +78,25 @@ def create_merge_ccs_task(
 
 
 def create_match_contins_tasks(
-    storagestr: str, storagedir: str, hashmax: int, max_face_shape: tuple[int, int]
+    storagestr: str, storagedir: str, num_merge_tasks: int, max_face_shape: tuple[int, int]
 ) -> Iterable:
     class MatchContinsTaskIterator(object):
         def __init__(self):
             pass
 
         def __len__(self):
-            return hashmax
+            return num_merge_tasks
 
         def __iter__(self):
-            for i in range(hashmax):
+            for i in range(num_merge_tasks):
                 yield partial(tasks_w_io.match_continuations_task,
                           storagestr, storagedir, i, max_face_shape)
 
     return MatchContinsTaskIterator()
 
 
-def create_seg_graph_cc_task(storagestr: str, hashmax: int) -> partial:
-    return partial(tasks_w_io.seg_graph_ccs, storagestr, hashmax)
+def create_seg_graph_cc_task(storagestr: str, num_merge_tasks: int) -> partial:
+    return partial(tasks_w_io.seg_graph_cc_task, storagestr, num_merge_tasks)
 
 
 def create_index_seg_map_task(storagestr: str) -> partial:
@@ -135,23 +135,23 @@ def create_merge_seginfo_tasks(
 
 
 def create_chunk_edges_tasks(
-    imgpath,
-    cleftpath,
-    segpath,
-    storagestr,
-    hashmax,
-    storagedir,
-    volshape,
-    chunkshape,
-    startcoord,
-    patchsz,
-    normcloudpath=None,
-    resolution=(4, 4, 40),
-    aggscratchpath=None,
-    aggchunksize=None,
-    aggmaxmip=None,
-    aggstartcoord=None,
-    bboxes=None,
+    imgpath: str,
+    cleftpath: str,
+    segpath: str,
+    storagestr: str,
+    num_merge_tasks: int,
+    storagedir: str,
+    volshape: tuple[int, int, int],
+    chunkshape: tuple[int, int, int],
+    startcoord: tuple[int, int, int],
+    patchsz: tuple[int, int, int,],
+    resolution: tuple[int, int, int] = (4, 4, 40),
+    normcloudpath: Optional[str] = None,
+    aggscratchpath: Optional[str] = None,
+    aggchunksize: Optional[tuple[int, int, int]] = None,
+    aggmaxmip: Optional[int] = 11,
+    aggstartcoord: Optional[tuple[int, int, int]] = None,
+    bboxes: Optional[list[Bbox]] = None,
 ):
     """ Only passing the required arguments for now """
 
@@ -166,102 +166,77 @@ def create_chunk_edges_tasks(
             return len(bboxes)
 
         def __iter__(self):
-            patchsz_str = tup2str(patchsz)
-            res_str = tup2str(resolution)
-
             for bbox in bboxes:
-                chunk_begin = tup2str(bbox.min())
-                chunk_end = tup2str(bbox.max())
+                chunk_begin = tuple(bbox.min())
+                chunk_end = tuple(bbox.max())
 
-                cmd = (
-                    f"chunk_edges {imgpath} {cleftpath} {segpath}"
-                    f" {storagestr} {hashmax} --storagedir {storagedir}"
-                    f" --chunk_begin {chunk_begin} --chunk_end {chunk_end}"
-                    f" --normcloudpath {normcloudpath} "
-                    f" --patchsz {patchsz_str} --resolution {res_str}"
+                yield partial(tasks_w_io.edge_task,
+                    imgpath,
+                    cleftpath,
+                    segpath,
+                    chunk_begin,
+                    chunk_end,
+                    patchsz,
+                    storagestr,
+                    resolution=resolution,
+                    normcloudpath=normcloudpath,
+                    aggscratchpath=aggscratchpath,
+                    aggchunksize=aggchunksize,
+                    aggmaxmip=aggmaxmip,
+                    aggstartcoord=aggstartcoord,
                 )
-
-                if normcloudpath is not None:
-                    cmd += f" --normcloudpath {normcloudpath}"
-
-                if aggscratchpath is not None:
-                    aggchunksize_str = tup2str(aggchunksize)
-                    aggstartcoord_str = tup2str(aggstartcoord)
-                    cmd += (
-                        f" --aggscratchpath {aggscratchpath}"
-                        f" --aggchunksize {aggchunksize_str}"
-                        f" --aggstartcoord {aggstartcoord_str}"
-                        f" --aggmaxmip {aggmaxmip}"
-                    )
-
-                yield SynaptorTask(cmd)
 
     return ChunkEdgesTaskIterator()
 
 
-def create_pick_edge_tasks(storagestr, hashmax):
+def create_pick_edge_tasks(
+    storagestr: str,
+    num_merge_tasks: int
+) -> Generator[partial, None, None]:
+
     class PickEdgeTaskIterator(object):
-        def __init__(self, storagestr, hashmax):
-            self.level_start = 0
-            self.level_end = hashmax
-            self.storagestr = storagestr
+        def __init__(self):
+            pass
 
         def __len__(self):
-            return self.level_end - self.level_start
-
-        def __getitem__(self, slc):
-            itr = copy.deepcopy(self)
-            itr.level_start = self.level_start + slc.start
-            itr.level_end = self.level_start + slc.stop
-            return itr
+            return num_merge_tasks
 
         def __iter__(self):
-            for i in range(self.level_start, self.level_end):
-                cmd = f"pick_edge {self.storagestr} {i}"
+            for i in range(num_merge_tasks):
+                yield partial(tasks_w_io.pick_largest_edges_task, storagestr, i)
 
-                yield SynaptorTask(cmd)
-
-    return PickEdgeTaskIterator(storagestr, hashmax)
+    return PickEdgeTaskIterator()
 
 
-def create_merge_dup_tasks(
-    storagestr,
-    hashmax,
-    dist_thresh,
-    size_thresh,
-    resolution=(4, 4, 40),
-    output_storagestr=None,
-):
+def create_merge_dups_tasks(
+    storagestr: str,
+    num_merge_tasks: int,
+    dist_thresh: float,
+    size_thresh: int,
+    resolution: tuple[int, int, int] = (4, 4, 40),
+    output_storagestr: str = None,
+) -> Generator[partial, None, None]:
 
     output_storagestr = storagestr if output_storagestr is None else output_storagestr
 
     class MergeDupsTaskIterator(object):
-        def __init__(self, storagestr, hashmax):
-            self.level_start = 0
-            self.level_end = hashmax
-            self.storagestr = storagestr
+        def __init__(self):
+            pass
 
         def __len__(self):
-            return self.level_end - self.level_start
-
-        def __getitem__(self, slc):
-            itr = copy.deepcopy(self)
-            itr.level_start = self.level_start + slc.start
-            itr.level_end = self.level_start + slc.stop
-            return itr
+            return num_merge_tasks
 
         def __iter__(self):
-            res_str = tup2str(resolution)
-            for i in range(self.level_start, self.level_end):
-                cmd = (
-                    f"merge_dups {self.storagestr} {i} {dist_thresh}"
-                    f" {size_thresh} --voxel_res {res_str}"
-                    f" --dst_storagestr {output_storagestr}"
+            for i in range(num_merge_tasks):
+                yield partial(tasks_w_io.merge_duplicates_task,
+                    resolution,
+                    dist_thresh,
+                    size_thresh,
+                    storagestr,
+                    i,
                 )
 
-                yield SynaptorTask(cmd)
-
-    return MergeDupsTaskIterator(storagestr, hashmax)
+    return MergeDupsTaskIterator()
 
 
 def create_remap_tasks(
