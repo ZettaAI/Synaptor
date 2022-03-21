@@ -15,6 +15,7 @@ Current downsides are:
 (2) Queries outside of the expected set could be very inefficient
 """
 
+from taskqueue import queueable
 from sqlalchemy import Table, Column
 from sqlalchemy import Integer, Float, BigInteger, Text
 import pandas as pd
@@ -35,6 +36,7 @@ TABLES = ["final", "contin_graph", "merged_edges", "chunk_edges",
           "continuations", "chunk_overlaps", "max_overlaps", "timing_log"]
 
 
+@queueable
 def init_db(url, segid_colname=cn.seg_id, metadata=None,
             edges=True, overlaps=False):
     """ Initializes a record database at a SQLAlchemy URL. """
