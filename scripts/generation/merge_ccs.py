@@ -31,7 +31,7 @@ def main(
 
     else:
         tq = TaskQueue(queueurl)
-        tq.insert_all(iterator)
+        tq.insert_all([task])
 
 
 if __name__ == "__main__":
