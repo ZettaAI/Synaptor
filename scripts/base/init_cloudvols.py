@@ -1,10 +1,11 @@
+"""Script to initialize cloudvolumes specified within a configuration file."""
 import argparse
 
 import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 
 
-def main(configfilename):
+def main(configfilename: str):
 
     config = parser.parse(configfilename)
 
@@ -15,11 +16,10 @@ def main(configfilename):
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
 
-    argparser = argparse.ArgumentParser()
+    ap.add_argument("configfilename", type=str, help="Configuration file.")
 
-    argparser.add_argument("configfilename")
+    args = ap.parse_args()
 
-    args = argparser.parse_args()
-
-    main(args.configfilename)
+    main(**vars(args))
