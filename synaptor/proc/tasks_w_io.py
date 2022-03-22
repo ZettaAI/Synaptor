@@ -220,6 +220,7 @@ def merge_ccs_task(
         )
 
 
+@queueable
 def match_continuations_task(
     storagestr: str,
     storagedir: str,
@@ -301,6 +302,7 @@ def match_continuations_task(
         )
 
 
+@queueable
 def seg_graph_cc_task(storagestr: str, hashmax: int, timing_tag: Optional[str] = None) -> None:
 
     start_time = time.time()
@@ -328,6 +330,7 @@ def seg_graph_cc_task(storagestr: str, hashmax: int, timing_tag: Optional[str] =
         )
 
 
+@queueable
 def chunk_seg_merge_map(storagestr: str, timing_tag: Optional[str] = None) -> None:
 
     start_time = time.time()
@@ -351,6 +354,7 @@ def chunk_seg_merge_map(storagestr: str, timing_tag: Optional[str] = None) -> No
         )
 
 
+@queueable
 def merge_seginfo_task(
     storagestr: str,
     hashval: int,
@@ -408,6 +412,7 @@ def merge_seginfo_task(
         )
 
 
+@queueable
 def edge_task(
     img_cvname,
     cleft_cvname,
@@ -586,6 +591,7 @@ def edge_task(
         )
 
 
+@queueable
 def merge_edges_task(voxel_res, dist_thr, size_thr, storagestr, timing_tag=None):
 
     start_time = time.time()
@@ -626,6 +632,7 @@ def merge_edges_task(voxel_res, dist_thr, size_thr, storagestr, timing_tag=None)
         )
 
 
+@queueable
 def pick_largest_edges_task(storagestr, clefthash=None, timing_tag=None):
 
     start_time = time.time()
@@ -668,6 +675,7 @@ def pick_largest_edges_task(storagestr, clefthash=None, timing_tag=None):
         )
 
 
+@queueable
 def merge_duplicates_task(
     voxel_res,
     dist_thr,
@@ -731,6 +739,7 @@ def merge_duplicates_task(
         )
 
 
+@queueable
 def overlap_task(
     seg_cvname,
     base_seg_cvname,
@@ -788,6 +797,7 @@ def overlap_task(
         )
 
 
+@queueable
 def merge_overlaps_task(storagestr, timing_tag=None):
 
     start_time = time.time()
