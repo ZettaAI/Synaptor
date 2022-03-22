@@ -31,6 +31,29 @@ def teardownfilequeue(path):
     os.rmdir(path)
 
 
+def killsubprocess(p: subprocess.Popen, num_retries: int = 10) -> None:
+    """Kills a subprocess."""
+    # Being a bit obsessive here
+    while num_retries > 0:
+        try:
+            p.send_signal(signal.SIGINT)
+            p.wait(1)
+            return
+        except subprocess.TimeoutExpired:
+            num_retries -= 1
+
+    if p.returncode is None:
+        p.terminate()
+        p.wait(5)
+
+    if p.returncode is None:
+        p.kill()
+        p.wait(5)
+
+    if p.returncode is None:
+        raise Exception("subprocess still running. Please kill it yourself.")
+
+
 @pytest.fixture(scope="session")
 def filequeue_no_td():
     return TaskQueue(TESTFILEQUEUEPATH)
@@ -69,22 +92,26 @@ def rabbitMQurl():
 
     yield "amqp://localhost:5672"
 
-    # Being a bit obsessive here
-    retries = 10
-    while retries > 0:
-        try:
-            p.send_signal(signal.SIGINT)
-            p.wait(1)
-            return
-        except subprocess.TimeoutExpired:
-            retries -= 1
+    killsubprocess(p)
 
-    if p.returncode is None:
-        p.terminate()
-        p.wait(5)
 
-    if p.returncode is None:
-        p.kill()
-        p.wait(5)
+@pytest.fixture(scope="session")
+def postgreSQLconnstr():
+    """Starts a postgres docker container and tears it down."""
+    p = subprocess.Popen(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-p",
+            "5432:5432",
+            "-e",
+            "POSTGRES_PASSWORD=postgres",
+            "postgres"
+        ]
+    )
+    time.sleep(3)
 
-    return
+    yield "postgres+psycopg2://postgres:postgres@localhost:5432/postgres"
+
+    killsubprocess(p)

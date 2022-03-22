@@ -61,6 +61,12 @@ def test_sanity_check():
     check_script(filename, TESTCFG)
 
 
+def test_init_db(postgreSQLconnstr):
+    filename = os.path.join(BASEDIR, "init_db.py")
+
+    check_script(filename, TESTCFG)
+
+
 def test_init_cloudvols():
     filename = os.path.join(BASEDIR, "init_cloudvols.py")
 
