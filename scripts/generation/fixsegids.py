@@ -18,7 +18,7 @@ def main(configfilename, tagfilename=None):
 
     iterator = tc.create_fixsegids_tasks(
                    storagestr=config["storagestrs"][0],
-                   hashmax=config["nummergetasks"],
+                   num_merge_tasks=config["nummergetasks"],
                    volshape=config["volshape"],
                    chunkshape=config["chunkshape"],
                    startcoord=config["startcoord"],

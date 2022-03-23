@@ -30,7 +30,7 @@ def create_connected_component_tasks(
     startcoord: tuple[int, int, int],
     resolution: tuple[int, int, int] = (8, 8, 40),
     parallel: int = 1,
-    hashmax: int = 1,
+    num_merge_tasks: int = 1,
     bboxes: list[Bbox] = None,
 ) -> Iterable:
     """Returns a iterator of partial cc_tasks."""
@@ -59,7 +59,7 @@ def create_connected_component_tasks(
                     szthresh,
                     chunk_begin=chunk_begin,
                     chunk_end=chunk_end,
-                    hashmax=hashmax,
+                    num_merge_tasks=num_merge_tasks,
                     parallel=parallel,
                     resolution=resolution,
                     storagedir=storagedir,
@@ -78,7 +78,10 @@ def create_merge_ccs_task(
 
 
 def create_match_contins_tasks(
-    storagestr: str, storagedir: str, num_merge_tasks: int, max_face_shape: tuple[int, int]
+    storagestr: str,
+    storagedir: str,
+    num_merge_tasks: int,
+    max_face_shape: tuple[int, int],
 ) -> Iterable:
     class MatchContinsTaskIterator(object):
         def __init__(self):
@@ -89,8 +92,13 @@ def create_match_contins_tasks(
 
         def __iter__(self):
             for i in range(num_merge_tasks):
-                yield partial(tasks_w_io.match_continuations_task,
-                          storagestr, storagedir, i, max_face_shape)
+                yield partial(
+                    tasks_w_io.match_continuations_task,
+                    storagestr,
+                    storagedir,
+                    i,
+                    max_face_shape,
+                )
 
     return MatchContinsTaskIterator()
 
@@ -112,24 +120,27 @@ def create_index_chunked_seg_map_task(storagestr: str) -> partial:
 
 
 def create_merge_seginfo_tasks(
-        storagestr: str,
-        hashmax: int,
-        aux_storagestr: Optional[str] = None,
-        szthresh: Optional[int] = None,
+    storagestr: str,
+    num_merge_tasks: int,
+    aux_storagestr: Optional[str] = None,
+    szthresh: Optional[int] = None,
 ) -> Generator[partial, None, None]:
-
     class MergeSeginfoTaskIterator(object):
         def __init__(self):
             pass
 
         def __len__(self):
-            return hashmax
+            return num_merge_tasks
 
         def __iter__(self):
-            for i in range(hashmax):
-                yield partial(tasks_w_io.merge_seginfo_task,
-                        storagestr, i, szthresh=szthresh,
-                        aux_storagestr=aux_storagestr)
+            for i in range(num_merge_tasks):
+                yield partial(
+                    tasks_w_io.merge_seginfo_task,
+                    storagestr,
+                    i,
+                    szthresh=szthresh,
+                    aux_storagestr=aux_storagestr,
+                )
 
     return MergeSeginfoTaskIterator()
 
@@ -170,7 +181,8 @@ def create_chunk_edges_tasks(
                 chunk_begin = tuple(bbox.min())
                 chunk_end = tuple(bbox.max())
 
-                yield partial(tasks_w_io.edge_task,
+                yield partial(
+                    tasks_w_io.edge_task,
                     imgpath,
                     cleftpath,
                     segpath,
@@ -190,10 +202,8 @@ def create_chunk_edges_tasks(
 
 
 def create_pick_edge_tasks(
-    storagestr: str,
-    num_merge_tasks: int
+    storagestr: str, num_merge_tasks: int
 ) -> Generator[partial, None, None]:
-
     class PickEdgeTaskIterator(object):
         def __init__(self):
             pass
@@ -228,7 +238,8 @@ def create_merge_dups_tasks(
 
         def __iter__(self):
             for i in range(num_merge_tasks):
-                yield partial(tasks_w_io.merge_duplicates_task,
+                yield partial(
+                    tasks_w_io.merge_duplicates_task,
                     resolution,
                     dist_thresh,
                     size_thresh,

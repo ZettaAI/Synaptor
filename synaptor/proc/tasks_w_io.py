@@ -37,7 +37,7 @@ def cc_task(
     resolution: Optional[Union[tuple[int, int, int], int]] = 0,
     parallel: Optional[int] = 1,
     storagedir: Optional[str] = None,
-    hashmax: Optional[int] = 100,
+    num_merge_tasks: Optional[int] = 100,
     timing_tag: Optional[str] = None,
 ) -> None:
     """Atomic connected components task with standard IO."""
@@ -103,7 +103,9 @@ def cc_task(
     # Adding this ugly branch bc the outputs need to be handled
     #  a bit differently here (see note below)
     if io.is_db_url(storagestr):
-        face_hashes = seg.hash_chunk_faces(chunk_begin, chunk_end, maxval=hashmax)
+        face_hashes = seg.hash_chunk_faces(
+            chunk_begin, chunk_end, maxval=num_merge_tasks
+        )
 
         fhash_df, fhash_tablename = timed(
             "Formatting chunk face hashes",
@@ -303,7 +305,9 @@ def match_continuations_task(
 
 
 @queueable
-def seg_graph_cc_task(storagestr: str, hashmax: int, timing_tag: Optional[str] = None) -> None:
+def seg_graph_cc_task(
+    storagestr: str, num_merge_tasks: int, timing_tag: Optional[str] = None
+) -> None:
 
     start_time = time.time()
 
@@ -315,7 +319,7 @@ def seg_graph_cc_task(storagestr: str, hashmax: int, timing_tag: Optional[str] =
         "Reading all unique seg ids", taskio.read_all_unique_seg_ids, storagestr
     )
 
-    seg_merge_df = tasks.seg_graph_cc_task(graph_edges, hashmax, all_ids)
+    seg_merge_df = tasks.seg_graph_cc_task(graph_edges, num_merge_tasks, all_ids)
 
     timed("Writing seg merge_map", taskio.write_seg_merge_map, seg_merge_df, storagestr)
 
@@ -429,7 +433,7 @@ def edge_task(
     base_res_begin=None,
     base_res_end=None,
     parallel=1,
-    hashmax=None,
+    num_merge_tasks=None,
     storagedir=None,
     normcloudpath=None,
     lower_clip_frac=0.01,
@@ -560,7 +564,7 @@ def edge_task(
         root_seg=None,
         samples_per_cleft=samples_per_cleft,
         dil_param=dil_param,
-        hashmax=hashmax,
+        num_merge_tasks=num_merge_tasks,
     )
 
     if num_downsamples > 0:
@@ -976,7 +980,7 @@ def fixsegids_task(
     aggchunksize=None,
     aggstartcoord=None,
     aggmaxmip=11,
-    hashmax=None,
+    num_merge_tasks=None,
 ):
 
     chunk_bounds = types.BBox3d(chunk_begin, chunk_end)
@@ -999,7 +1003,9 @@ def fixsegids_task(
         aggmaxmip,
     )
 
-    fixed_df = tasks.fixsegids_task(edge_df, bboxes, mappings, hashmax=hashmax)
+    fixed_df = tasks.fixsegids_task(
+        edge_df, bboxes, mappings, num_merge_tasks=num_merge_tasks
+    )
 
     timed(
         "Writing results",

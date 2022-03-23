@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser()
 
 # Inputs & Outputs
 parser.add_argument("storagestr")
-parser.add_argument("hashmax", type=int)
+parser.add_argument("num_merge_tasks", type=int)
 
 parser.add_argument("--timing_tag", default=None)
 

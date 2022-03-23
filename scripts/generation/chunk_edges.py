@@ -2,8 +2,8 @@ import argparse
 
 from taskqueue import TaskQueue
 
-import synaptor.cloud.kube.parser as parser
-import synaptor.cloud.kube.task_creation as tc
+import synaptor.cloud.parser as parser
+import synaptor.cloud.task_creation as tc
 from synaptor import io
 
 
@@ -19,7 +19,7 @@ def main(configfilename, tagfilename=None):
     iterator = tc.create_chunk_edges_tasks(
                    config["image"], config["tempoutput"], config["baseseg"],
                    storagestr=config["storagestrs"][0],
-                   hashmax=config["nummergetasks"],
+                   num_merge_tasks=config["nummergetasks"],
                    storagedir=config["storagestrs"][1],
                    volshape=config["volshape"],
                    chunkshape=config["chunkshape"],

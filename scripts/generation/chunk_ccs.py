@@ -37,7 +37,7 @@ def main(
         chunkshape=config["chunkshape"],
         startcoord=config["startcoord"],
         resolution=config["voxelres"],
-        hashmax=config["nummergetasks"],
+        num_merge_tasks=config["nummergetasks"],
         bboxes=bboxes,
     )
 
