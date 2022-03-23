@@ -95,15 +95,6 @@ def test_create_chunk_seg_map(filequeue):
     run_insertion_test([task], filequeue)
 
 
-def test_create_chunk_seg_map(filequeue):
-    """Checks whether create_index_seg_map runs."""
-    task = task_creation.create_chunk_seg_map_task("storagestr")
-
-    assert isinstance(task, partial)
-
-    run_insertion_test([task], filequeue)
-
-
 def test_create_index_chunked_seg_map(filequeue):
     """Checks whether create_index_seg_map runs."""
     task = task_creation.create_index_chunked_seg_map_task("storagestr")

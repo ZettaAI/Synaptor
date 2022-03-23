@@ -1,4 +1,4 @@
-"""Task generation script for remapping tasks."""
+"""Task generation script to add chunk labels to a segment remapping."""
 from __future__ import annotations
 
 import argparse

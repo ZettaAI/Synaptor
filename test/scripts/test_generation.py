@@ -100,6 +100,30 @@ def test_merge_seginfo(filequeue, rabbitMQurl):
     filequeue.purge()
 
 
+def test_chunk_edges(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "chunk_edges.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
+def test_pick_edge(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "pick_edge.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
+def test_merge_dups(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "merge_dups.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
 def test_remap(filequeue, rabbitMQurl):
     filename = os.path.join(GENERATIONDIR, "remap.py")
 

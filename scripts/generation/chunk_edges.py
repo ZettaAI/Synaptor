@@ -1,13 +1,23 @@
+"""Task generation script for chunkwise synapse assignment."""
+from __future__ import annotations
+
 import argparse
+from typing import Optional
 
 from taskqueue import TaskQueue
+from kombuworker import taskqueueworker as tqw
 
 import synaptor.cloud.parser as parser
 import synaptor.cloud.task_creation as tc
 from synaptor import io
 
 
-def main(configfilename, tagfilename=None):
+def main(
+    configfilename: str,
+    queueurl: Optional[str] = None,
+    queuename: Optional[str] = None,
+    tagfilename: Optional[str] = None,
+) -> None:
 
     config = parser.parse(configfilename)
 
@@ -17,33 +27,44 @@ def main(configfilename, tagfilename=None):
         bboxes = None
 
     iterator = tc.create_chunk_edges_tasks(
-                   config["image"], config["tempoutput"], config["baseseg"],
-                   storagestr=config["storagestrs"][0],
-                   num_merge_tasks=config["nummergetasks"],
-                   storagedir=config["storagestrs"][1],
-                   volshape=config["volshape"],
-                   chunkshape=config["chunkshape"],
-                   startcoord=config["startcoord"],
-                   patchsz=config["patchshape"],
-                   normcloudpath=config["normcloudpath"],
-                   resolution=config["voxelres"],
-                   aggscratchpath=config["aggscratchpath"],
-                   aggchunksize=config["aggchunksize"],
-                   aggmaxmip=config["aggmaxmip"],
-                   aggstartcoord=config["startcoord"],
-                   bboxes=bboxes)
+        config["image"],
+        config["tempoutput"],
+        config["baseseg"],
+        storagestr=config["storagestrs"][0],
+        num_merge_tasks=config["nummergetasks"],
+        storagedir=config["storagestrs"][1],
+        volshape=config["volshape"],
+        chunkshape=config["chunkshape"],
+        startcoord=config["startcoord"],
+        patchsz=config["patchshape"],
+        normcloudpath=config["normcloudpath"],
+        resolution=config["voxelres"],
+        aggscratchpath=config["aggscratchpath"],
+        aggchunksize=config["aggchunksize"],
+        aggmaxmip=config["aggmaxmip"],
+        aggstartcoord=config["startcoord"],
+        bboxes=bboxes,
+    )
 
-    tq = TaskQueue(config["queueurl"])
-    tq.insert_all(iterator)
+    queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)
+    queuename = parser.parse_opt_if_not_passed("queuename", queuename, configfilename)
+
+    if queueurl.startswith("amqp://"):
+        tqw.insert_tasks(queueurl, queuename, iterator)
+
+    else:
+        tq = TaskQueue(queueurl)
+        tq.insert_all(iterator)
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
 
-    argparser = argparse.ArgumentParser()
+    ap.add_argument("configfilename", type=str, help="Path to the configuration file")
+    ap.add_argument("--queueurl", type=str, default=None, help="queue URL")
+    ap.add_argument("--queuename", type=str, default=None, help="queue name (AMQP)")
+    ap.add_argument("--tagfilename", default=None)
 
-    argparser.add_argument("configfilename")
-    argparser.add_argument("--tagfilename", default=None)
-
-    args = argparser.parse_args()
+    args = ap.parse_args()
 
     main(**vars(args))
