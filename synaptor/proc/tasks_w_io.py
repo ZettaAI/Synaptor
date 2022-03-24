@@ -744,6 +744,100 @@ def merge_duplicates_task(
 
 
 @queueable
+def merge_dup_maps_task(
+    storagestr: str,
+    num_merge_tasks: int,
+    timing_tag: Optional[str] = None,
+):
+    start_time = time.time()
+
+    dup_id_map_filenames = timed(
+        "Downloading duplicate maps from storage",
+        taskio.pull_all_dup_id_maps,
+        storagestr,
+        num_merge_tasks,
+    )
+
+    timed(
+        "Concatenating duplicate map files",
+        io.utils.concat_csvs,
+        dup_id_map_filenames,
+        "__dup_id_map.df",
+    )
+
+    timed(
+        "Writing full map to storage",
+        taskio.send_dup_map_id_file,
+        "__dup_id_map.df",
+        storagestr,
+    )
+
+
+@queueable
+def remap_ids_task(
+    seg_in_cvname: str,
+    seg_out_cvname: str,
+    chunk_begin: tuple[int, int, int],
+    chunk_end: tuple[int, int, int],
+    storagestr: str,
+    dup_map_storagestr: str = None,
+    resolution: tuple[int, int, int] = 0,
+    parallel: int = 1,
+    timing_tag: str = None,
+) -> None:
+    """Rendering a final segmentation layer by remapping the atomic results."""
+    dup_map_storagestr = (
+        storagestr if dup_map_storagestr is None else dup_map_storagestr
+    )
+
+    start_time = time.time()
+
+    chunk_bounds = types.BBox3d(chunk_begin, chunk_end)
+
+    chunk_id_map = timed(
+        "Reading chunk id map", taskio.read_chunk_id_map, storagestr, chunk_bounds
+    )
+
+    dup_id_map = timed(
+        "Reading duplicate id map",
+        taskio.read_filtered_dup_id_map,
+        dup_map_storagestr,
+        chunk_id_map.values(),
+    )
+
+    seg = timed(
+        "Reading cleft chunk",
+        io.read_cloud_volume_chunk,
+        seg_in_cvname,
+        chunk_bounds,
+        mip=resolution,
+        parallel=parallel,
+    )
+
+    seg = tasks.remap_ids_task(seg, chunk_id_map, dup_id_map, copy=False)
+
+    timed(
+        "Writing results",
+        io.write_cloud_volume_chunk,
+        seg,
+        seg_out_cvname,
+        chunk_bounds,
+        mip=resolution,
+        parallel=parallel,
+    )
+
+    if timing_tag is not None:
+        timed(
+            "Writing total task time",
+            taskio.write_task_timing,
+            time.time() - start_time,
+            "remap",
+            timing_tag,
+            storagestr,
+        )
+
+
+@queueable
 def overlap_task(
     seg_cvname,
     base_seg_cvname,
@@ -820,70 +914,6 @@ def merge_overlaps_task(storagestr, timing_tag=None):
             taskio.write_task_timing,
             time.time() - start_time,
             "merge_overlap",
-            timing_tag,
-            storagestr,
-        )
-
-
-@queueable
-def remap_ids_task(
-    seg_in_cvname: str,
-    seg_out_cvname: str,
-    chunk_begin: tuple[int, int, int],
-    chunk_end: tuple[int, int, int],
-    storagestr: str,
-    dup_map_storagestr: str = None,
-    resolution: tuple[int, int, int] = 0,
-    parallel: int = 1,
-    timing_tag: str = None,
-) -> None:
-    """Rendering a final segmentation layer by remapping the atomic results."""
-    dup_map_storagestr = (
-        storagestr if dup_map_storagestr is None else dup_map_storagestr
-    )
-
-    start_time = time.time()
-
-    chunk_bounds = types.BBox3d(chunk_begin, chunk_end)
-
-    chunk_id_map = timed(
-        "Reading chunk id map", taskio.read_chunk_id_map, storagestr, chunk_bounds
-    )
-
-    dup_id_map = timed(
-        "Reading duplicate id map",
-        taskio.read_filtered_dup_id_map,
-        dup_map_storagestr,
-        chunk_id_map.values(),
-    )
-
-    seg = timed(
-        "Reading cleft chunk",
-        io.read_cloud_volume_chunk,
-        seg_in_cvname,
-        chunk_bounds,
-        mip=resolution,
-        parallel=parallel,
-    )
-
-    seg = tasks.remap_ids_task(seg, chunk_id_map, dup_id_map, copy=False)
-
-    timed(
-        "Writing results",
-        io.write_cloud_volume_chunk,
-        seg,
-        seg_out_cvname,
-        chunk_bounds,
-        mip=resolution,
-        parallel=parallel,
-    )
-
-    if timing_tag is not None:
-        timed(
-            "Writing total task time",
-            taskio.write_task_timing,
-            time.time() - start_time,
-            "remap",
             timing_tag,
             storagestr,
         )

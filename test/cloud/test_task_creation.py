@@ -124,11 +124,11 @@ def test_create_chunk_edges(filequeue):
         "segpath",
         "storagestr",
         10,  # num_merge_tasks
-        "storagedir",
         (2, 2, 2),  # volshape
         (1, 1, 1),  # chunkshape
         (0, 0, 0),  # startcoord
         (1, 1, 1),  # patchsz
+        storagedir="storagedir",
     )
 
     assert isinstance(next(iter(it)), partial)

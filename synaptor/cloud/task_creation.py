@@ -151,17 +151,17 @@ def create_chunk_edges_tasks(
     segpath: str,
     storagestr: str,
     num_merge_tasks: int,
-    storagedir: str,
     volshape: tuple[int, int, int],
     chunkshape: tuple[int, int, int],
     startcoord: tuple[int, int, int],
     patchsz: tuple[int, int, int,],
-    resolution: tuple[int, int, int] = (4, 4, 40),
+    storagedir: Optional[str] = None,
+    resolution: Optional[tuple[int, int, int]] = (4, 4, 40),
     normcloudpath: Optional[str] = None,
     aggscratchpath: Optional[str] = None,
     aggchunksize: Optional[tuple[int, int, int]] = None,
-    aggmaxmip: Optional[int] = 11,
     aggstartcoord: Optional[tuple[int, int, int]] = None,
+    aggmaxmip: Optional[int] = 11,
     bboxes: Optional[list[Bbox]] = None,
 ):
     """ Only passing the required arguments for now """
@@ -190,12 +190,14 @@ def create_chunk_edges_tasks(
                     chunk_end,
                     patchsz,
                     storagestr,
+                    storagedir=storagedir,
                     resolution=resolution,
                     normcloudpath=normcloudpath,
                     aggscratchpath=aggscratchpath,
                     aggchunksize=aggchunksize,
                     aggmaxmip=aggmaxmip,
                     aggstartcoord=aggstartcoord,
+                    num_merge_tasks=num_merge_tasks,
                 )
 
     return ChunkEdgesTaskIterator()
