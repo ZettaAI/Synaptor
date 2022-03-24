@@ -1,6 +1,4 @@
 """ Base processing tasks for cloud workflows """
-
-
 import time
 
 from .. import seg_utils
