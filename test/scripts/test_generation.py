@@ -124,6 +124,14 @@ def test_merge_dups(filequeue, rabbitMQurl):
     filequeue.purge()
 
 
+def test_merge_dup_maps(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "merge_dup_maps.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
 def test_remap(filequeue, rabbitMQurl):
     filename = os.path.join(GENERATIONDIR, "remap.py")
 

@@ -164,6 +164,18 @@ def test_create_merge_dups(filequeue):
     run_insertion_test(it, filequeue)
 
 
+def test_create_merge_dup_maps(filequeue):
+    """Checks whether create_merge_dup_maps_task runs."""
+    task = task_creation.create_merge_dup_maps_task(
+        "storagestr",
+        10,  # num_merge_tasks
+    )
+
+    assert isinstance(task, partial)
+
+    run_insertion_test([task], filequeue)
+
+
 def test_create_remap(filequeue):
     """Checks whether create_remap_tasks runs."""
     it = task_creation.create_remap_tasks(

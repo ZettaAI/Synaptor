@@ -252,6 +252,13 @@ def create_merge_dups_tasks(
     return MergeDupsTaskIterator()
 
 
+def create_merge_dup_maps_task(
+    storagestr: str,
+    num_merge_tasks: int
+) -> partial:
+    return partial(tasks_w_io.merge_dup_maps_task, storagestr, num_merge_tasks)
+
+
 def create_remap_tasks(
     seg_in_path: str,
     seg_out_path: str,
