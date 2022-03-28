@@ -9,6 +9,7 @@
 # (2) $1 == 'worker' -> worker.py
 # (3) $1 == 'generate' -> a generation script.
 
+
 case $1 in
     # base tasks
     chunk_ccs)        /usr/bin/env python -u base/chunk_ccs.py ${@:2} ;;
@@ -36,23 +37,26 @@ case $1 in
     # generate - branches again
     generate)
         case $2 in
-            chunk_ccs)        /usr/bin/env python -u generation/chunk_ccs.py ${@:3} ;;
-            merge_ccs)        /usr/bin/env python -u generation/merge_ccs.py ${@:3} ;;
-            match_contins)    /usr/bin/env python -u generation/match_contins.py ${@:3} ;;
-            seg_graph_ccs)    /usr/bin/env python -u generation/seg_graph_ccs.py ${@:3} ;;
-            chunk_seg_map)    /usr/bin/env python -u generation/chunk_seg_map.py ${@:3} ;;
-            merge_seginfo)    /usr/bin/env python -u generation/merge_seginfo.py ${@:3} ;;
-            chunk_edges)      /usr/bin/env python -u generation/chunk_edges.py ${@:3} ;;
-            pick_edge)        /usr/bin/env python -u generation/pick_edge.py ${@:3} ;;
-            merge_dups)       /usr/bin/env python -u generation/merge_dups.py ${@:3} ;;
-            remap)            /usr/bin/env python -u generation/remap.py ${@:3} ;;
-            chunk_overlaps)   /usr/bin/env python -u generation/chunk_overlaps.py ${@:3} ;;
-            merge_overlaps)   /usr/bin/env python -u generation/merge_overlaps.py ${@:3} ;;
-            chunk_anchors)    /usr/bin/env python -u generation/chunk_anchors.py ${@:3} ;;
-            create_index)     /usr/bin/env python -u generation/create_index.py ${@:3} ;;
-            dedup_chunk_segs) /usr/bin/env python -u generation/dedup_chunk_segs.py ${@:3} ;;
-            init_db)          /usr/bin/env python -u generation/init_db.py ${@:3} ;;
-            self_destruct)    /usr/bin/env python -u generation/self_destruct.py ${@:3} ;;
+            chunk_ccs)             /usr/bin/env python -u generation/chunk_ccs.py ${@:3} ;;
+            merge_ccs)             /usr/bin/env python -u generation/merge_ccs.py ${@:3} ;;
+            match_contins)         /usr/bin/env python -u generation/match_contins.py ${@:3} ;;
+            seg_graph_ccs)         /usr/bin/env python -u generation/seg_graph_ccs.py ${@:3} ;;
+            chunk_seg_map)         /usr/bin/env python -u generation/chunk_seg_map.py ${@:3} ;;
+            merge_seginfo)         /usr/bin/env python -u generation/merge_seginfo.py ${@:3} ;;
+            chunk_edges)           /usr/bin/env python -u generation/chunk_edges.py ${@:3} ;;
+            pick_edge)             /usr/bin/env python -u generation/pick_edge.py ${@:3} ;;
+            merge_dups)            /usr/bin/env python -u generation/merge_dups.py ${@:3} ;;
+            merge_dup_maps)        /usr/bin/env python -u generation/merge_dup_maps.py ${@:3} ;;
+            remap)                 /usr/bin/env python -u generation/remap.py ${@:3} ;;
+            chunk_overlaps)        /usr/bin/env python -u generation/chunk_overlaps.py ${@:3} ;;
+            merge_overlaps)        /usr/bin/env python -u generation/merge_overlaps.py ${@:3} ;;
+            chunk_anchors)         /usr/bin/env python -u generation/chunk_anchors.py ${@:3} ;;
+            create_index)          /usr/bin/env python -u generation/create_index.py ${@:3} ;;
+            dedup_chunk_segs)      /usr/bin/env python -u generation/dedup_chunk_segs.py ${@:3} ;;
+            init_db)               /usr/bin/env python -u generation/init_db.py ${@:3} ;;
+            index_seg_map)         /usr/bin/env python -u generation/index_seg_map.py ${@:3} ;;
+            index_chunked_seg_map) /usr/bin/env python -u generation/index_chunked_seg_map.py ${@:3} ;;
+            self_destruct)         /usr/bin/env python -u generation/self_destruct.py ${@:3} ;;
             *)  echo "invalid task name: $2"; false
 	esac
     ;;
