@@ -1,5 +1,5 @@
 """ Cleft ID mapping IO for processing tasks """
-
+from __future__ import annotations
 
 import os
 
