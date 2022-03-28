@@ -767,7 +767,7 @@ def merge_dup_maps_task(
 
     timed(
         "Writing full map to storage",
-        taskio.send_dup_map_id_file,
+        taskio.send_dup_map,
         "__dup_id_map.df",
         storagestr,
     )
