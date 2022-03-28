@@ -1,27 +1,19 @@
-import argparse
+"""Task generation script to index a segmentation id map."""
+from __future__ import annotations
 
-from taskqueue import TaskQueue
+from functools import partial
+from configparser import ConfigParser
 
-import synaptor.cloud.kube.parser as parser
-import synaptor.cloud.kube.task_creation as tc
+from synaptor.cloud import task_creation as tc
+from synaptor.cloud.generator import generator, genparser
 
 
-def main(configfilename):
-
-    config = parser.parse(configfilename)
-
-    task = tc.create_index_seg_map_task(config["storagestrs"][0])
-
-    tq = TaskQueue(config["queueurl"])
-    tq.insert_all([task])
+@generator()
+def main(config: ConfigParser) -> partial:
+    return tc.create_index_seg_map_task(config["storagestrs"][0])
 
 
 if __name__ == "__main__":
-
-    argparser = argparse.ArgumentParser()
-
-    argparser.add_argument("configfilename")
-
-    args = argparser.parse_args()
+    args = genparser.parse_args()
 
     main(args.configfilename)

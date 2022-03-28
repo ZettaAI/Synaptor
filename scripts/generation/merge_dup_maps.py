@@ -8,7 +8,7 @@ from synaptor.cloud import task_creation as tc
 from synaptor.cloud.generator import generator, genparser
 
 
-@generator
+@generator()
 def main(config: ConfigParser) -> partial:
 
     return tc.create_merge_dup_maps_task(

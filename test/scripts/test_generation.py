@@ -84,8 +84,24 @@ def test_merge_ccs(filequeue, rabbitMQurl):
     filequeue.purge()
 
 
+def test_index_seg_map(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "index_seg_map.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
 def test_chunk_seg_map(filequeue, rabbitMQurl):
     filename = os.path.join(GENERATIONDIR, "chunk_seg_map.py")
+
+    check_script(filename, filequeue, rabbitMQurl)
+
+    filequeue.purge()
+
+
+def test_index_chunked_seg_map(filequeue, rabbitMQurl):
+    filename = os.path.join(GENERATIONDIR, "index_chunked_seg_map.py")
 
     check_script(filename, filequeue, rabbitMQurl)
 
