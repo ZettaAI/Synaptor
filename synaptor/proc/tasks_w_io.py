@@ -758,19 +758,21 @@ def merge_dup_maps_task(
         num_merge_tasks,
     )
 
+    tempfilename = io.utils.temp_path()
     timed(
         "Concatenating duplicate map files",
         io.utils.concat_csvs,
         dup_id_map_filenames,
-        "__dup_id_map.df",
+        tempfilename,
     )
 
     timed(
         "Writing full map to storage",
         taskio.send_dup_map,
-        "__dup_id_map.df",
+        tempfilename,
         storagestr,
     )
+    os.remove(tempfilename)
 
 
 @queueable
