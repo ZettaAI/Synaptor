@@ -50,7 +50,7 @@ def read_hashed_edge_info(proc_url, partnerhash=None,
     metadata = io.open_db_metadata(proc_url)
 
     if merged:
-        edges = metadata.tables["merge_edges"]
+        edges = metadata.tables["merged_edges"]
     else:
         edges = metadata.tables["chunk_edges"]
 
@@ -157,7 +157,7 @@ def read_merged_edge_info(proc_url):
     if io.is_db_url(proc_url):
         metadata = io.open_db_metadata(proc_url)
 
-        edges = metadata.tables["merge_edges"]
+        edges = metadata.tables["merged_edges"]
         columns = list(edges.c[name] for name in EDGE_INFO_COLUMNS)
         statement = select(columns)
 
@@ -173,7 +173,7 @@ def write_merged_edge_info(dframe, proc_url):
     """ Writes a merged edge info dataframe to storage. """
     if io.is_db_url(proc_url):
         dframe = dframe.reset_index()
-        io.write_db_dframe(dframe, proc_url, "merge_edges", index=False)
+        io.write_db_dframe(dframe, proc_url, "merged_edges", index=False)
 
     else:
         io.write_dframe(dframe, proc_url, fn.merged_edgeinfo_fname)
