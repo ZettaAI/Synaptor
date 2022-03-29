@@ -14,7 +14,7 @@ from synaptor.cloud.generator import generator, genparser, add_bbox_arg
 
 @generator(bboxes=True)
 def main(
-    config: ConfigParser, bboxes: Optional[list[BBox3d]] = None
+    config: dict, bboxes: Optional[list[BBox3d]] = None
 ) -> Generator[partial, None, None]:
     return tc.create_connected_component_tasks(
         config["descriptor"],
@@ -29,6 +29,7 @@ def main(
         resolution=config["voxelres"],
         num_merge_tasks=config["nummergetasks"],
         bboxes=bboxes,
+        configfilename=config["filename"],
     )
 
 

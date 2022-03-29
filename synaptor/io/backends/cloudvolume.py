@@ -53,6 +53,7 @@ def write_cloud_volume_chunk(
     bbox: BBox3d,
     sources: list[str],
     motivation: str,
+    parameters: dict,
     resolution: Optional[Union[int, tuple[float, float, float]]] = 0,
     parallel: Optional[int] = 1,
     non_aligned: Optional[bool] = False,
@@ -60,12 +61,17 @@ def write_cloud_volume_chunk(
 ) -> None:
     """Write a chunk of data specified by a bounding box."""
 
+    thisprocess = thisProcess(parameters)
+
     cv = cirrusvolume.CloudVolume(
         cv_path,
-        mip=mip,
+        mip=resolution,
         parallel=parallel,
         non_aligned_writes=non_aligned,
         progress=progress,
+        sources=sources,
+        motivation=motivation,
+        process=thisprocess,
     )
 
     # ensuring that we always read something for non-aligned writes

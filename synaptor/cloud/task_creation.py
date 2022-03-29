@@ -28,10 +28,11 @@ def create_connected_component_tasks(
     volshape: tuple[int, int, int],
     chunkshape: tuple[int, int, int],
     startcoord: tuple[int, int, int],
-    resolution: tuple[int, int, int] = (8, 8, 40),
-    parallel: int = 1,
-    num_merge_tasks: int = 1,
-    bboxes: list[Bbox] = None,
+    resolution: Optional[tuple[int, int, int]] = (8, 8, 40),
+    parallel: Optional[int] = 1,
+    num_merge_tasks: Optional[int] = 1,
+    bboxes: Optional[list[Bbox]] = None,
+    configfilename: Optional[str] = None
 ) -> Iterable:
     """Returns a iterator of partial cc_tasks."""
     print(bboxes)
@@ -63,6 +64,7 @@ def create_connected_component_tasks(
                     parallel=parallel,
                     resolution=resolution,
                     storagedir=storagedir,
+                    configfilename=configfilename,
                 )
 
     return ConnectedComponentsTaskIterator()

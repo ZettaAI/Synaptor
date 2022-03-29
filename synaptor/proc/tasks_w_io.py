@@ -23,6 +23,7 @@ from . import norm
 from . import io as taskio
 from . import colnames as cn
 from .tasks import timed
+from synaptor.cloud import parser
 
 
 @queueable
@@ -39,6 +40,7 @@ def cc_task(
     storagedir: Optional[str] = None,
     num_merge_tasks: Optional[int] = 100,
     timing_tag: Optional[str] = None,
+    configfilename: Optional[str] = None,
 ) -> None:
     """Atomic connected components task with standard IO."""
     start_time = time.time()
@@ -74,7 +76,7 @@ def cc_task(
         io.read_cloud_volume_chunk,
         desc_cvname,
         chunk_bounds,
-        mip=resolution,
+        resolution=resolution,
         parallel=parallel,
     )
 
@@ -82,14 +84,20 @@ def cc_task(
         desc_vol, cc_thresh, sz_thresh, offset=chunk_begin
     )
 
+    # Parsing provenance information for CirrusVolume
+    config = parser.scrubparameters(parser.parse(configfilename))
+
     timed(
         f"Writing seg chunk: {chunk_bounds}",
         io.write_cloud_volume_chunk,
         ccs,
         seg_cvname,
         chunk_bounds,
-        mip=resolution,
+        resolution=resolution,
         parallel=parallel,
+        sources=config["sources"],
+        motivation=config["motivation"],
+        parameters=config,
     )
 
     timed(
@@ -478,7 +486,7 @@ def edge_task(
         io.read_cloud_volume_chunk,
         img_cvname,
         chunk_bounds,
-        mip=resolution,
+        resolution=resolution,
         parallel=parallel,
         request_payer=None,
     )
@@ -507,7 +515,7 @@ def edge_task(
         io.read_cloud_volume_chunk,
         cleft_cvname,
         base_bounds,
-        mip=0,
+        resolution=0,
         parallel=parallel,
     )
 
@@ -517,7 +525,7 @@ def edge_task(
             io.read_cloud_volume_chunk,
             seg_cvname,
             chunk_bounds,
-            mip=resolution,
+            resolution=resolution,
             parallel=parallel,
         )
     else:
@@ -814,11 +822,14 @@ def remap_ids_task(
         io.read_cloud_volume_chunk,
         seg_in_cvname,
         chunk_bounds,
-        mip=resolution,
+        resolution=resolution,
         parallel=parallel,
     )
 
     seg = tasks.remap_ids_task(seg, chunk_id_map, dup_id_map, copy=False)
+
+    # Parsing provenance information for CirrusVolume
+    config = parser.scrubparameters(parser.parse(configfilename))
 
     timed(
         "Writing results",
@@ -826,8 +837,11 @@ def remap_ids_task(
         seg,
         seg_out_cvname,
         chunk_bounds,
-        mip=resolution,
+        resolution=resolution,
         parallel=parallel,
+        sources=config["sources"],
+        motivation=config["motivation"],
+        parameters=config,
     )
 
     if timing_tag is not None:
@@ -848,7 +862,7 @@ def overlap_task(
     chunk_begin,
     chunk_end,
     storagedir,
-    mip=0,
+    resolution=0,
     seg_mip=None,
     parallel=1,
     timing_tag=None,
@@ -856,7 +870,7 @@ def overlap_task(
 
     start_time = time.time()
 
-    seg_mip = mip if seg_mip is None else seg_mip
+    seg_mip = resolution if seg_mip is None else seg_mip
 
     chunk_bounds = types.BBox3d(chunk_begin, chunk_end)
 
@@ -865,7 +879,7 @@ def overlap_task(
         io.read_cloud_volume_chunk,
         seg_cvname,
         chunk_bounds,
-        mip=mip,
+        resolution=resolution,
         parallel=parallel,
     )
 
@@ -874,7 +888,7 @@ def overlap_task(
         io.read_cloud_volume_chunk,
         base_seg_cvname,
         chunk_bounds,
-        mip=seg_mip,
+        resolution=seg_mip,
         parallel=parallel,
     )
 
@@ -932,7 +946,7 @@ def anchor_task(
     root_seg_cvname=None,
     voxel_res=[4, 4, 40],
     min_box_width=[100, 100, 5],
-    mip=0,
+    resolution=0,
     seg_mip=None,
     parallel=1,
     timing_tag=None,
@@ -940,7 +954,7 @@ def anchor_task(
 
     start_time = time.time()
 
-    seg_mip = mip if seg_mip is None else seg_mip
+    seg_mip = resolution if seg_mip is None else seg_mip
 
     chunk_bounds = types.BBox3d(chunk_begin, chunk_end)
 
@@ -949,7 +963,7 @@ def anchor_task(
         io.read_cloud_volume_chunk,
         seg_cvname,
         chunk_bounds,
-        mip=seg_mip,
+        resolution=seg_mip,
         parallel=parallel,
     )
 
@@ -958,7 +972,7 @@ def anchor_task(
         io.read_cloud_volume_chunk,
         cleft_cvname,
         chunk_bounds,
-        mip=mip,
+        resolution=resolution,
         parallel=parallel,
     )
 
@@ -968,7 +982,7 @@ def anchor_task(
             io.read_cloud_volume_chunk,
             root_seg_cvname,
             chunk_bounds,
-            mip=seg_mip,
+            resolution=seg_mip,
             parallel=parallel,
         )
         assert roots.shape == seg.shape, "mismatched root segmentation"
