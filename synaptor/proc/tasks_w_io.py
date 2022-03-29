@@ -796,6 +796,7 @@ def remap_ids_task(
     resolution: tuple[int, int, int] = 0,
     parallel: int = 1,
     timing_tag: str = None,
+    configfilename: str = None,
 ) -> None:
     """Rendering a final segmentation layer by remapping the atomic results."""
     dup_map_storagestr = (

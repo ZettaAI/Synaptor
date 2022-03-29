@@ -79,6 +79,10 @@ def parse(filename: str):
     conf["sources"] = get_sources(conf)
     conf["motivation"] = parser.get("Provenance", "motivation")
 
+    # Some tasks need to re-parse the config file to get provenance info
+    # for CirrusVolume
+    conf["filename"] = filename
+
     return conf
 
 

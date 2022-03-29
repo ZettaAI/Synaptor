@@ -272,6 +272,7 @@ def create_remap_tasks(
     dup_map_storagestr: str = None,
     resolution: tuple[int, int, int] = (8, 8, 40),
     parallel: int = 1,
+    configfilename: str = None,
 ) -> Iterable:
     """Returns a iterator of partial remap_ids_tasks."""
     dup_map_storagestr = (
@@ -301,6 +302,7 @@ def create_remap_tasks(
                     storagestr=storagestr,
                     dup_map_storagestr=dup_map_storagestr,
                     resolution=resolution,
+                    configfilename=configfilename,
                 )
 
     return RemapTaskIterator()
