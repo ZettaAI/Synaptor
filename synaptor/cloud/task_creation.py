@@ -346,15 +346,25 @@ def create_merge_overlaps_task(storagestr):
 
 
 def create_cloudvols(
-    output_path, temp_output_path, voxelres, vol_shape, startcoord, block_shape
-):
+    output_path: str,
+    temp_output_path: str,
+    voxelres: tuple[float, float, float],
+    vol_shape: tuple[int, int, int],
+    startcoord: tuple[int, int, int],
+    block_shape: tuple[int, int, int],
+    sources: list[str],
+    motivation: str,
+    parameters: dict,
+) -> None:
+    """Creates the cloudvolumes required for processing."""
 
     io.init_seg_volume(
         output_path,
         voxelres,
         vol_shape,
-        "",
-        [],
+        sources,
+        motivation,
+        parameters,
         offset=startcoord,
         chunk_size=block_shape,
     )
@@ -364,8 +374,9 @@ def create_cloudvols(
             temp_output_path,
             voxelres,
             vol_shape,
-            "",
-            [],
+            sources,
+            motivation,
+            parameters,
             offset=startcoord,
             chunk_size=block_shape,
         )

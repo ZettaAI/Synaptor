@@ -1,18 +1,26 @@
 """Script to initialize cloudvolumes specified within a configuration file."""
 import argparse
 
-import synaptor.cloud.parser as parser
-import synaptor.cloud.task_creation as tc
+from synaptor.cloud import parser
+from synaptor.cloud import task_creation as tc
 
 
 def main(configfilename: str):
 
     config = parser.parse(configfilename)
+    parameters = parser.scrubparameters(config)
 
     tc.create_cloudvols(
-        config["output"], config["tempoutput"],
-        config["voxelres"], config["volshape"],
-        config["startcoord"], config["blockshape"])
+        config["output"],
+        config["tempoutput"],
+        config["voxelres"],
+        config["volshape"],
+        config["startcoord"],
+        config["blockshape"],
+        config["sources"],
+        config["motivation"],
+        parameters,
+    )
 
 
 if __name__ == "__main__":

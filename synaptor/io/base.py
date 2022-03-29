@@ -300,6 +300,7 @@ read_db_dframe = bck.sqlalchemy.read_dframe
 write_db_dframe = bck.sqlalchemy.write_dframe_copy_from
 read_db_dframes = bck.sqlalchemy.read_dframes
 write_db_dframes = bck.sqlalchemy.write_dframes_copy_from
+is_db_url = bck.sqlalchemy.is_db_url
 
 
 @queueable
@@ -311,7 +312,3 @@ def create_index(*args, **kwargs):
 def is_remote_path(uri):
     """ Whether a uri describes a cloud backend. """
     return GCLOUD_REGEXP.match(uri) or AWS_REGEXP.match(uri)
-
-
-def is_db_url(uri):
-    return any(regexp.match(uri) for regexp in DB_REGEXPS)
