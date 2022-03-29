@@ -1,24 +1,19 @@
 """ CloudVolume Interface """
 from __future__ import annotations
 
-import os
-import re
-import warnings
 from os.path import dirname
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import cirrusvolume
 import provenancetoolbox as ptb
 
 from synaptor import BBox3d
-from synaptor.cloud import parser
-from .sqlalchemy import is_db_url
 
 
 def read_cloud_volume_chunk(
     cv_path: str,
-    bbox: Bbox3d,
+    bbox: BBox3d,
     resolution: Optional[Union[int, tuple[float, float, float]]] = 0,
     parallel: Optional[int] = 1,
     progress: Optional[bool] = False,

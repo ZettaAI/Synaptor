@@ -162,7 +162,7 @@ def scrubconnstr(connstr: str) -> str:
     credential_inds = credential_match.start() + 3, credential_match.end() - 1
 
     connstr = (
-        connstr[: credential_inds[0]] + "*****:*****" + connstr[credential_inds[1] :]
+        connstr[: credential_inds[0]] + "*****:*****" + connstr[credential_inds[1]:]
     )
 
     return connstr

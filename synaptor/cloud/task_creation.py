@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from functools import partial
 from typing import Iterable, Generator, Optional
 
@@ -156,7 +155,7 @@ def create_chunk_edges_tasks(
     volshape: tuple[int, int, int],
     chunkshape: tuple[int, int, int],
     startcoord: tuple[int, int, int],
-    patchsz: tuple[int, int, int,],
+    patchsz: tuple[int, int, int],
     storagedir: Optional[str] = None,
     resolution: Optional[tuple[int, int, int]] = (4, 4, 40),
     normcloudpath: Optional[str] = None,

@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 import time
 import signal
-from typing import Optional
+from typing import Optional, Union
 
 from taskqueue import queueable
 
@@ -759,8 +759,6 @@ def merge_dup_maps_task(
     num_merge_tasks: int,
     timing_tag: Optional[str] = None,
 ):
-    start_time = time.time()
-
     dup_id_map_filenames = timed(
         "Downloading duplicate maps from storage",
         taskio.pull_all_dup_id_maps,
