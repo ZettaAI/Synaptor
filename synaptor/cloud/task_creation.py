@@ -247,6 +247,7 @@ def create_merge_dups_tasks(
                     size_thresh,
                     storagestr,
                     i,
+                    output_storagestr=output_storagestr,
                 )
 
     return MergeDupsTaskIterator()
