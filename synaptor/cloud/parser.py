@@ -1,5 +1,6 @@
 """Parsing functions for configuration files."""
 import re
+import warnings
 from typing import Optional
 from configparser import ConfigParser
 
