@@ -686,13 +686,15 @@ def merge_duplicates_task(
     size_thr,
     src_storagestr,
     hash_index,
-    dst_storagestr=None,
+    output_storagestr=None,
     timing_tag=None,
 ):
 
     start_time = time.time()
 
-    dst_storagestr = src_storagestr if dst_storagestr is None else dst_storagestr
+    output_storagestr = (
+        src_storagestr if output_storagestr is None else output_storagestr
+    )
 
     edge_df = timed(
         f"Reading edges for hash index {hash_index}",
@@ -714,21 +716,21 @@ def merge_duplicates_task(
     )
 
     # Considered using a transaction here, but that breaks generality
-    # when src_storagestr != dst_storagestr and writing the dup_id_map
+    # when src_storagestr != output_storagestr and writing the dup_id_map
     # twice shouldn't cause any bad effects. Testing should evaluate this
     # call.
     timed(
         "Writing duplicate id mapping for hash index",
         taskio.write_dup_id_map,
         dup_id_map,
-        dst_storagestr,
+        output_storagestr,
         hash_index,
     )
     timed(
         "Writing final DataFrame for hash index",
         taskio.write_full_info,
         full_df,
-        dst_storagestr,
+        output_storagestr,
         tag=hash_index,
     )
 
