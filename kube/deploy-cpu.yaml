@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -25,10 +25,10 @@ spec:
         name: synaptor-cpu
         imagePullPolicy: IfNotPresent
         command: ["/bin/sh"]
-        args: ["-c", "python -u worker.py [QUEUE_URL] [TIMEOUT]"]
+        args: ["-c", "python -u worker.py https://sqs.us-east-1.amazonaws.com/588508870071/synaptor 900"]
         resources: 
           requests:
-            cpu: 3
+            cpu: 5
         volumeMounts:
         - name: secrets
           mountPath: /root/.cloudvolume/secrets/google-secret.json
