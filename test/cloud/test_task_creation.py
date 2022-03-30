@@ -1,4 +1,6 @@
 """Tests for synaptor.cloud.task_creation."""
+from __future__ import annotations
+
 from typing import Iterable
 from functools import partial
 

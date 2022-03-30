@@ -1,4 +1,6 @@
-""" IO Utility Functions """
+"""IO Utility Functions"""
+from __future__ import annotations
+
 import re
 import random
 import string

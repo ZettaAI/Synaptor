@@ -2,6 +2,8 @@
 
 Accepts tasks from a queue until it receives a kill task signal.
 """
+from __future__ import annotations
+
 import argparse
 from typing import Optional
 
