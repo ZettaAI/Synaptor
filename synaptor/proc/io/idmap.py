@@ -1,5 +1,5 @@
 """ Cleft ID mapping IO for processing tasks """
-
+from __future__ import annotations
 
 import os
 
@@ -48,8 +48,9 @@ def pull_unique_id_files(storagestr, bboxes):
 
     # you get a bunch of error messages if you specify the same
     # files more than once
-    remote_filenames = list(set([unique_ids_fname(storagestr, bbox)
-                                 for bbox in bboxes]))
+    remote_filenames = list(
+        set([unique_ids_fname(storagestr, bbox) for bbox in bboxes])
+    )
 
     local_filenames = io.pull_files(remote_filenames)
 
@@ -106,8 +107,10 @@ def read_all_chunk_unique_ids(proc_url):
 
     chunk_tag_to_df = dict(iter(dframe.groupby(cn.chunk_tag)))
 
-    map_lookup = {io.bbox_from_tag(tag).min(): unique_id_dframe_to_map(df)
-                  for (tag, df) in chunk_tag_to_df.items()}
+    map_lookup = {
+        io.bbox_from_tag(tag).min(): unique_id_dframe_to_map(df)
+        for (tag, df) in chunk_tag_to_df.items()
+    }
 
     return map_lookup
 
@@ -144,11 +147,11 @@ def write_chunked_seg_map(proc_url):
     merge_map_id = seg_merge_map.c[cn.src_id]
 
     select_stmt = select(cs_columns + smm_columns).select_from(
-                      chunk_segs.join(seg_merge_map,
-                                      chunk_seg_id == merge_map_id))
+        chunk_segs.join(seg_merge_map, chunk_seg_id == merge_map_id)
+    )
     full_stmt = chunked_map.insert().from_select(
-                    names=chunked_map_colnames,
-                    select=select_stmt)
+        names=chunked_map_colnames, select=select_stmt
+    )
 
     io.execute_db_statement(proc_url, full_stmt)
 
@@ -211,8 +214,7 @@ def read_dup_id_map(proc_url):
         metadata = io.open_db_metadata(proc_url)
 
         dup_map = metadata.tables["dup_merge_map"]
-        dframe = io.read_db_dframe(proc_url, dup_map.select(),
-                                   index_col=cn.src_id)
+        dframe = io.read_db_dframe(proc_url, dup_map.select(), index_col=cn.src_id)
 
     else:
         try:
@@ -235,11 +237,10 @@ def read_filtered_dup_id_map(storagestr, src_ids, chunksize=100000):
         try:
             mapping = dict()
             for subdf in io.read_dframe(
-                             storagestr, fn.dup_map_fname,
-                             chunksize=chunksize):
+                storagestr, fn.dup_map_fname, chunksize=chunksize
+            ):
                 reqd_rows = subdf.loc[src_ids.intersection(subdf.index)]
-                mapping.update(
-                    dict(zip(reqd_rows.index, reqd_rows[cn.dst_id])))
+                mapping.update(dict(zip(reqd_rows.index, reqd_rows[cn.dst_id])))
 
         except Exception as e:
             print(e)
@@ -262,3 +263,31 @@ def write_dup_id_map(id_map, storagestr, hash_index=None):
         else:
             dst_filename = fn.dup_map_fname
         io.write_dframe(dframe, storagestr, dst_filename)
+
+
+def pull_all_dup_id_maps(storagestr: str, num_merge_tasks: int) -> list[str]:
+    """Downloads all of the duplicate maps generated from parallel merge tasks."""
+    if io.is_db_url(storagestr):
+        raise Exception(
+            "not implemented for DB io - you can read the full map directly"
+        )
+
+    else:
+        remote_filenames = [
+            os.path.join(storagestr, fn.tagged_dup_fname.format(i=i))
+            for i in range(num_merge_tasks)
+        ]
+
+        return io.pull_files(remote_filenames)
+
+
+def send_dup_map(filename: str, storagestr: str) -> None:
+    """Sends a duplicate map file to storage."""
+    if io.is_db_url(storagestr):
+        raise Exception(
+            "not implemented for DB io - you can read the full map directly"
+        )
+
+    else:
+        remote_filename = os.path.join(storagestr, fn.dup_map_fname)
+        io.send_file(filename, remote_filename)

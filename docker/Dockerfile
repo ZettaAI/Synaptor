@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04 
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential git \
@@ -12,4 +12,5 @@ RUN apt-get update \
     && pip install -e /Synaptor \
     && conda clean -t -p
 
-WORKDIR /Synaptor/task_scripts
+WORKDIR /Synaptor/scripts
+ENTRYPOINT ["./entrypoint.sh"]
