@@ -1,4 +1,5 @@
 """ Database functionality through SQLAlchemy """
+from __future__ import annotations
 
 import re
 import shutil
@@ -219,3 +220,7 @@ def create_index(url, tablename, *colnames):
     index = sa.Index(f"manual_idx_{tablename}_{colstring}", *columns)
 
     index.create(engine)
+
+
+def is_db_url(uri: str) -> bool:
+    return any(regexp.match(uri) for regexp in REGEXPS)

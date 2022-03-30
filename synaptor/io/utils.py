@@ -1,10 +1,12 @@
-""" IO Utility Functions """
+"""IO Utility Functions"""
+from __future__ import annotations
 
-import os
 import re
 import random
 import string
+import tempfile
 import fileinput
+from typing import Optional
 
 import numpy as np
 
@@ -41,25 +43,32 @@ def fname_chunk_tag(chunk_bounds):
     """ Creates a filename tag for a 3d dataset chunk """
     chunk_min = chunk_bounds.min()
     chunk_max = chunk_bounds.max()
-    return "{0}_{1}_{2}-{3}_{4}_{5}".format(chunk_min[0], chunk_min[1],
-                                            chunk_min[2],
-                                            chunk_max[0], chunk_max[1],
-                                            chunk_max[2])
+    return "{0}_{1}_{2}-{3}_{4}_{5}".format(
+        chunk_min[0],
+        chunk_min[1],
+        chunk_min[2],
+        chunk_max[0],
+        chunk_max[1],
+        chunk_max[2],
+    )
 
 
-def temp_path(path):
-    """ Creates a temporary filename for """
-    no_prefix = GCLOUD_REGEXP.sub("", AWS_REGEXP.sub("", path))
-    tag = random_tag()
+def temp_path(path: Optional[str] = None):
+    """Creates a temporary file and returns its path.
 
-    return tag + "_" + os.path.basename(no_prefix)
+    Needs to be cleaned by the user. Accepts an argument for backwards compatibility.
+    """
+    namedtempfile = tempfile.NamedTemporaryFile(delete=False)
+    namedtempfile.close()
+
+    return namedtempfile.name
 
 
 def random_tag(k=8):
     """ Returns a random tag for disambiguating filenames """
-    return "".join(random.choice(string.ascii_uppercase +
-                                 string.digits)
-                   for _ in range(k))
+    return "".join(
+        random.choice(string.ascii_uppercase + string.digits) for _ in range(k)
+    )
 
 
 def bbox_from_fname(path):
@@ -88,9 +97,9 @@ def split_tag(tag):
     match = SPLIT_REGEXP.search(tag)
     assert match is not None, "split delimiter not found in tag"
     dash_index = match.start() + 1
-    return tag[:dash_index], tag[dash_index+1:]
+    return tag[:dash_index], tag[dash_index + 1:]
 
-    
+
 def extract_sorted_bboxes(local_dir):
     """
     Takes every file within a local directory, and returns a list
@@ -159,4 +168,4 @@ def concat_csvs(filenames, output_filename):
 
 def read_bbox_tag_filename(filename):
     with open(filename) as f:
-        return [bbox_from_fname(l) for l in f]
+        return [bbox_from_fname(line) for line in f]

@@ -1,6 +1,8 @@
 # Kubernetes Framework
 
-A user can run distributed workflows on a kubernetes cluster using the scripts in this directory. First, the user will need to set up a cluster and deploy one of the deployment files here depending on their requirements (CPU nodes, GPU nodes, or a mix of both), along with the required secret files. Next, the user will need to allow their pods to access some shared file storage system (e.g. Google Cloud Storage or Amazon S3), and set up a task queue (see [seunglab/python-task-queue](https://github.com/seung-lab/python-task-queue)). If using the database backend (only useful for very intensive workloads), the user will also need to set up a database that each pod can access. Once this infrastructure is in place, an outline for the remaining steps is outlined below.
+A user can run distributed workflows on a kubernetes cluster using the materials in this directory (along with the generation scripts in the [scripts/task_generation directory](https://github.com/ZettaAI/Synaptor/tree/master/scripts/generation)).  
+
+First, the user will need to set up a cluster and deploy one of the deployment files here depending on their requirements (CPU nodes, GPU nodes, or a mix of both), along with the required credential/secret files. Next, the user will need to allow their pods to access some shared file storage system (e.g. Google Cloud Storage or Amazon S3), and set up a task queue (see [seunglab/python-task-queue](https://github.com/seung-lab/python-task-queue)). If using the database backend (only useful for very intensive workloads), the user will also need to set up a database that each pod can access. Once this infrastructure is in place, the remaining steps are outlined below.
 
 ## Creating a configuation file
 

@@ -1,16 +1,38 @@
 """ CloudVolume Interface """
+from __future__ import annotations
 
-import cloudvolume
+from os.path import dirname
+from typing import Optional, Union
+
+import numpy as np
+import cirrusvolume
+import provenancetoolbox as ptb
+
+from synaptor import BBox3d
 
 
 def read_cloud_volume_chunk(
-    cv_name, bbox, mip=0, parallel=1, progress=False,
-    request_payer=None):
-    """ Read a chunk of data specified by a bounding box. """
+    cv_path: str,
+    bbox: BBox3d,
+    resolution: Optional[Union[int, tuple[float, float, float]]] = 0,
+    parallel: Optional[int] = 1,
+    progress: Optional[bool] = False,
+    request_payer: Optional[str] = None,
+) -> np.ndarray:
+    """Read a chunk of data specified by a bounding box."""
 
-    cv = cloudvolume.CloudVolume(cv_name, mip=mip, parallel=parallel,
-                                 progress=progress,
-                                 request_payer=request_payer)
+    if request_payer is None:
+        cv = cirrusvolume.CloudVolume(
+            cv_path, mip=resolution, parallel=parallel, progress=progress
+        )
+    else:
+        cv = cirrusvolume.CloudVolume(
+            cv_path,
+            mip=resolution,
+            parallel=parallel,
+            progress=progress,
+            request_payer=request_payer,
+        )
 
     # ensuring that we always read something
     # (i.e. that we know what we're doing)
@@ -20,13 +42,32 @@ def read_cloud_volume_chunk(
     return cv[bbox.index()][:, :, :, 0]
 
 
-def write_cloud_volume_chunk(data, cv_name, bbox, mip=0,
-                             parallel=1, non_aligned=False, progress=False):
-    """ Write a chunk of data specified by a bounding box. """
+def write_cloud_volume_chunk(
+    data: np.ndarray,
+    cv_path: str,
+    bbox: BBox3d,
+    sources: list[str],
+    motivation: str,
+    parameters: dict,
+    resolution: Optional[Union[int, tuple[float, float, float]]] = 0,
+    parallel: Optional[int] = 1,
+    non_aligned: Optional[bool] = False,
+    progress: Optional[bool] = False,
+) -> None:
+    """Write a chunk of data specified by a bounding box."""
 
-    cv = cloudvolume.CloudVolume(cv_name, mip=mip, parallel=parallel,
-                                 non_aligned_writes=non_aligned,
-                                 progress=progress)
+    thisprocess = thisProcess(parameters)
+
+    cv = cirrusvolume.CloudVolume(
+        cv_path,
+        mip=resolution,
+        parallel=parallel,
+        non_aligned_writes=non_aligned,
+        progress=progress,
+        sources=sources,
+        motivation=motivation,
+        process=thisprocess,
+    )
 
     # ensuring that we always read something for non-aligned writes
     cv.fill_missing = True
@@ -35,25 +76,50 @@ def write_cloud_volume_chunk(data, cv_name, bbox, mip=0,
     cv[bbox.index()] = data.astype(cv.dtype)
 
 
-def init_seg_volume(cv_name, resolution, vol_size,
-                    description, owners, offset=(0, 0, 0),
-                    sources=None, chunk_size=(64, 64, 64)):
+def init_seg_volume(
+    cv_path: str,
+    resolution: Union[int, tuple[float, float, float]],
+    vol_shape: tuple[int, int, int],
+    sources: list[str],
+    motivation: str,
+    parameters: dict,
+    offset: Optional[tuple[int, int, int]] = (0, 0, 0),
+    chunk_size: Optional[tuple[int, int, int]] = (64, 64, 64),
+) -> cirrusvolume.CloudVolume:
     """ Initialize a CloudVolume for use as a cleft segmentation. """
 
-    info = cloudvolume.CloudVolume.create_new_info(1, "segmentation", "uint32",
-                                                   "raw", resolution, offset,
-                                                   vol_size,
-                                                   chunk_size=chunk_size)
+    info = cirrusvolume.CloudVolume.create_new_info(
+        1,  # num_channels
+        "segmentation",  # layer_type
+        "uint32",  # data_type
+        "raw",  # encoding
+        resolution,
+        offset,
+        vol_shape,
+        chunk_size=chunk_size,
+    )
 
-    cv = cloudvolume.CloudVolume(cv_name, mip=0, info=info)
+    thisprocess = thisProcess(parameters)
 
-    cv.provenance["owners"] = owners
-    cv.provenance["description"] = description
-
-    if sources is not None:
-        cv.provenance["sources"] = sources
+    cv = cirrusvolume.CloudVolume(
+        cv_path,
+        mip=0,
+        info=info,
+        sources=sources,
+        motivation=motivation,
+        process=thisprocess
+    )
 
     cv.commit_info()
     cv.commit_provenance()
+    cv.document()
 
     return cv
+
+
+def thisProcess(parameters: Optional[dict] = {}) -> ptb.Process:
+    """Creates a provenancetoolbox process for this package."""
+    repopath = dirname(dirname(dirname(dirname(__file__))))
+    environment = ptb.PythonGithubEnv(repopath)
+
+    return ptb.Process("synaptor", parameters, environment)

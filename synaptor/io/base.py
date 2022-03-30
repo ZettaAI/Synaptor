@@ -1,11 +1,13 @@
-__doc__ = """
-Base IO functions - wrap around cloud backends and local IO
+"""Base IO functions - wraps around cloud backends and local IO
 
 Nicholas Turner <nturner@cs.princeton.edu>, 2018
 """
 
 import os
 import warnings
+from functools import wraps
+
+from taskqueue import queueable
 
 from . import backends as bck
 from . import utils
@@ -73,8 +75,7 @@ def send_file(local_path, path):
     elif AWS_REGEXP.match(path):
         bck.aws.send_file(local_path, path)
     else:
-        warnings.warn(f"Pathname {path} doesn't match remote pattern",
-                      Warning)
+        warnings.warn(f"Pathname {path} doesn't match remote pattern", Warning)
         bck.local.send_file(local_path, path)
 
 
@@ -91,8 +92,7 @@ def send_files(local_paths, dst_dir):
     elif AWS_REGEXP.match(dst_dir):
         bck.aws.send_files(local_paths, dst_dir)
     else:
-        warnings.warn(f"Pathname {dst_dir} doesn't match remote pattern",
-                      Warning)
+        warnings.warn(f"Pathname {dst_dir} doesn't match remote pattern", Warning)
         bck.local.send_files(local_paths, dst_dir)
 
 
@@ -109,8 +109,7 @@ def send_directory(local_dir, path):
     elif AWS_REGEXP.match(path):
         bck.aws.send_directory(local_dir, path)
     else:
-        warnings.warn("Pathname {} doesn't match remote pattern".format(path),
-                      Warning)
+        warnings.warn("Pathname {} doesn't match remote pattern".format(path), Warning)
         bck.local.send_directory(local_dir, path)
 
 
@@ -151,10 +150,10 @@ def write_dframe(dframe, path_or_head, basename=None):
 
     if is_remote_path(path):
         send_file(local_fname, path)
+        os.remove(local_fname)
 
 
-def read_edge_csv(path_or_head, basename=None,
-                  delim=";", only_confident=False):
+def read_edge_csv(path_or_head, basename=None, delim=";", only_confident=False):
     """
     Reads a csv of edges of the form
     "id;presyn;postsyn"
@@ -171,8 +170,9 @@ def read_edge_csv(path_or_head, basename=None,
     else:
         local_fname = path
 
-    return bck.local.read_edge_csv(local_fname, delim=delim,
-                                   only_confident=only_confident)
+    return bck.local.read_edge_csv(
+        local_fname, delim=delim, only_confident=only_confident
+    )
 
 
 def write_edge_csv(edges, path_or_head, basename=None, delim=";"):
@@ -196,6 +196,7 @@ def write_edge_csv(edges, path_or_head, basename=None, delim=";"):
 
     if is_remote_path(path):
         send_file(local_fname, path)
+        os.remove(local_fname)
 
 
 def read_network(net_fname, chkpt_fname):
@@ -236,6 +237,8 @@ def write_network(net, prefix_or_head, basename=None):
     if is_remote_path(prefix):
         send_file(local_net, prefix + ".py")
         send_file(local_chkpt, prefix + ".chkpt")
+        os.remove(local_net)
+        os.remove(local_chkpt)
 
 
 def open_h5(path):
@@ -289,6 +292,7 @@ def write_h5(data, path_or_head, basename=None, chunk_size=None):
 
     if is_remote_path(path):
         send_file(local_fname, path)
+        os.remove(local_fname)
 
 
 # Defining db versions of a few functions
@@ -296,13 +300,15 @@ read_db_dframe = bck.sqlalchemy.read_dframe
 write_db_dframe = bck.sqlalchemy.write_dframe_copy_from
 read_db_dframes = bck.sqlalchemy.read_dframes
 write_db_dframes = bck.sqlalchemy.write_dframes_copy_from
-create_index = bck.sqlalchemy.create_index
+is_db_url = bck.sqlalchemy.is_db_url
+
+
+@queueable
+@wraps(bck.sqlalchemy.create_index)
+def create_index(*args, **kwargs):
+    return bck.sqlalchemy.create_index(*args, **kwargs)
 
 
 def is_remote_path(uri):
     """ Whether a uri describes a cloud backend. """
     return GCLOUD_REGEXP.match(uri) or AWS_REGEXP.match(uri)
-
-
-def is_db_url(uri):
-    return any(regexp.match(uri) for regexp in DB_REGEXPS)
