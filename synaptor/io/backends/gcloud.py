@@ -3,6 +3,7 @@
 import os
 import re
 import glob
+import math
 import subprocess
 
 import cloudvolume  # Piggybacking on cloudvolume's secrets
@@ -30,24 +31,24 @@ def pull_file(remote_path, alwayspull=False):
     return local_fname
 
 
-def pull_files(remote_paths, check=True,
+def pull_files(remote_paths, dest=".", check=True,
                batching_limit=50000, batch_size=1000):
 
     if len(remote_paths) > batching_limit:
-        return pull_files_in_batches(remote_paths, batch_size)
+        return pull_files_in_batches(remote_paths, dest, batch_size)
     else:
-        subprocess.run(["gsutil", "-m", "-q", "cp", *remote_paths, "."],
+        subprocess.run(["gsutil", "-m", "-q", "cp", *remote_paths, dest],
                        check=check)
         return list(map(os.path.basename, remote_paths))
 
 
-def pull_files_in_batches(paths, check=True, batch_size=1000):
-    num_batches = len(paths) / batch_size + 1
+def pull_files_in_batches(paths, dest=".", check=True, batch_size=1000):
+    num_batches = int(math.ceil(len(paths) / batch_size))
 
     local_paths = list()
     for i in range(num_batches):
         batch_paths = paths[i*batch_size:(i+1)*batch_size]
-        subprocess.run(["gsutil", "-m", "-q", "cp", *batch_paths, "."],
+        subprocess.run(["gsutil", "-m", "-q", "cp", *batch_paths, dest],
                        check=check)
         local_paths.extend(map(os.path.basename, batch_paths))
 
