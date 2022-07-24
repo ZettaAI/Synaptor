@@ -8,7 +8,7 @@ def main(configfilename):
     try:
         # the parser performs sanity checking for every task
         # (see synaptor.cloud.parser)
-        parser.parse(configfilename)
+        parser.sanity_check(parser.parse(configfilename))
 
     except ValueError as e:
         print("sanity check failed")

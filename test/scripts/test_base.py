@@ -55,7 +55,7 @@ def delete_cloudvolume(path: str) -> None:
 
 
 # Actual tests
-def test_sanity_check():
+def test_sanity_check(testcloudvolume):
     filename = os.path.join(BASEDIR, "sanity_check.py")
 
     check_script(filename, TESTCFG)

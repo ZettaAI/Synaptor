@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 import warnings
+import cirrusvolume as cv
 from typing import Optional
 from configparser import ConfigParser
 
@@ -180,3 +181,19 @@ def get_sources(config: ConfigParser):
         return [config["descriptor"], config["image"], config["baseseg"]]
     else:
         raise ValueError(f"Unknown workflowtype: {workflowtype}")
+
+
+def sanity_check(conf: dict):
+    """Inspects the contents of a parsed configuration for obvious errors."""
+    check_volumes_exist(conf)
+
+
+def check_volumes_exist(conf: dict) -> None:
+    def checkvol(key: str) -> None:
+        assert cv.CloudVolume(conf[key]), f"Volume {key} not accessible"
+
+    checkvol("descriptor")
+
+    if conf["workflowtype"] == "Segmentation+Assignment":
+        checkvol("image")
+        checkvol("baseseg")

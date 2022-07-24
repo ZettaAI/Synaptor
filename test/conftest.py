@@ -9,10 +9,42 @@ import signal
 import subprocess
 
 import pytest
+import cloudvolume as cv
 from taskqueue import TaskQueue
 
 
+DUMMY_CV_PATH = "./test/test_cv"
+DUMMY_CONFIG_PATH = "./test/test.cfg"
 TESTFILEQUEUEPATH = "fq://test/testfilequeue"
+
+
+def make_testcloudvolume(path):
+    """Makes a dummy CloudVolume."""
+    num_channels = 1
+    layer_type = "segmentation"
+    data_type = "uint32"
+    encoding = "raw"
+    resolution = (4, 4, 40)
+    voxel_offset = (0, 0, 0)
+    volume_size = (4, 4, 4)
+    chunk_size = (2, 2, 2)
+
+    info = cv.CloudVolume.create_new_info(
+        num_channels,
+        layer_type,
+        data_type,
+        encoding,
+        resolution,
+        voxel_offset,
+        volume_size,
+        chunk_size=chunk_size,
+    )
+
+    vol = cv.CloudVolume(f"file://{path}", mip=0, info=info)
+
+    vol.commit_info()
+
+    return vol
 
 
 def removefiles(expr):
@@ -23,6 +55,19 @@ def removefiles(expr):
             os.rmdir(filename)
         else:
             os.remove(filename)
+
+
+def teardown(path):
+    """Removes files in a way that's somewhat specific to CloudVolumes."""
+    removefiles(os.path.join(path, "*"))
+    os.rmdir(path)
+
+
+@pytest.fixture
+def testcloudvolume():
+    """Creates a dummy CV and tears it down afterwards."""
+    yield make_testcloudvolume(DUMMY_CV_PATH)
+    teardown(DUMMY_CV_PATH)
 
 
 def teardownfilequeue(path):
