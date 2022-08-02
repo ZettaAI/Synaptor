@@ -27,6 +27,8 @@ Synaptor produces a dataframe with each segment described within a row
 `bbox_end_[xyz]` - The voxel coordinate of the (exclusive) end of the segment's bounding box
 `presyn_segid` - The ID of the presynaptic segment within the "base" segmentation used.
 `postsyn_segid` - The ID of the postsynaptic segment within the "base" segmentation used.
+`presyn_[xyz]_vx` - The voxel coordinate of the presynaptic "anchor point" for segmentation changes.
+`postsyn_[xyz]_vx` - The voxel coordinate of the postsynaptic "anchor point" for segmentation changes.
 `vx_count` - The size of the segment in voxels
 `centroid_[xyz]_nm` The centroid coordinate scaled by the supplied voxel resolution
 
