@@ -23,6 +23,7 @@ from . import norm
 from . import io as taskio
 from . import colnames as cn
 from .tasks import timed
+from .io import filenames as fn
 from synaptor.cloud import parser
 
 
@@ -1029,3 +1030,81 @@ def self_destruct():
     # signal.raise_signal(signal.SIGINT)
     print("SELF-DESTRUCT TASK RECEIVED")
     os.kill(os.getpid(), signal.SIGINT)
+
+
+@queueable
+def clean_csvs(
+    storagestr: str,
+    voxelres: tuple[float, ...],
+    num_merge_tasks: int = 1,
+    targetres: Optional[tuple[float, ...]] = None,
+) -> None:
+    """Concatenates the final dataframes from parallel workflows."""
+    targetres = voxelres if targetres is None else targetres
+
+    local_paths = timed(
+        "Downloading info files",
+        taskio.fullinfo.pull_full_info,
+        storagestr,
+        num_merge_tasks,
+    )
+
+    colmapping = {
+        "centroid_x": "centroid_x_vx",
+        "centroid_y": "centroid_y_vx",
+        "centroid_z": "centroid_z_vx",
+        "bbox_bx": "bbox_begin_x",
+        "bbox_by": "bbox_begin_y",
+        "bbox_bz": "bbox_begin_z",
+        "bbox_ex": "bbox_end_x",
+        "bbox_ey": "bbox_end_y",
+        "bbox_ez": "bbox_end_z",
+        "presyn_x": "presyn_x_vx",
+        "presyn_y": "presyn_y_vx",
+        "presyn_z": "presyn_z_vx",
+        "postsyn_x": "postsyn_x_vx",
+        "postsyn_y": "postsyn_y_vx",
+        "postsyn_z": "postsyn_z_vx",
+        "size": "vx_count",
+    }
+
+    def clean_csv(filename: str) -> None:
+        df = io.read_dframe(filename)
+
+        df = df.drop([cn.clefthash, cn.partnerhash], axis=1, errors="ignore")
+
+        df = df.rename(colmapping, axis=1)
+
+        df["centroid_x_nm"] = (df["centroid_x_vx"] * voxelres[0]).astype(int)
+        df["centroid_y_nm"] = (df["centroid_y_vx"] * voxelres[1]).astype(int)
+        df["centroid_z_nm"] = (df["centroid_z_vx"] * voxelres[2]).astype(int)
+
+        df["centroid_x_vx"] = (
+            df["centroid_x_vx"] * voxelres[0] // targetres[0]
+        ).astype(int)
+        df["centroid_y_vx"] = (
+            df["centroid_y_vx"] * voxelres[1] // targetres[1]
+        ).astype(int)
+        df["centroid_z_vx"] = (
+            df["centroid_z_vx"] * voxelres[2] // targetres[2]
+        ).astype(int)
+
+        df.to_csv(filename)
+
+    for (i, path) in enumerate(local_paths):
+        timed(f"Cleaning csv {i}", clean_csv, path)
+
+    if len(local_paths) > 1:
+        timed(
+            "Concatenating csvs",
+            io.utils.concat_csvs,
+            local_paths,
+            fn.final_edgeinfo_fname,
+        )
+
+    timed(
+        "Writing final edgelist",
+        io.send_file,
+        fn.final_edgeinfo_fname,
+        os.path.join(storagestr, fn.final_edgeinfo_fname),
+    )

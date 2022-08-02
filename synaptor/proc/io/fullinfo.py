@@ -1,5 +1,7 @@
 """ Edge info DataFrame IO for processing tasks """
+from __future__ import annotations
 
+import os
 
 from sqlalchemy import select
 
@@ -30,6 +32,28 @@ def read_full_info(proc_url):
 
     else:
         return io.read_dframe(proc_url, fn.final_edgeinfo_fname)
+
+
+def pull_full_info(storagestr: str, num_merge_tasks: int = 1) -> list[str]:
+    """Downloads final/full information files and returns their paths."""
+    if io.is_db_url(storagestr):
+        fullinfo = read_full_info(storagestr)
+
+        outputfilename = os.path.join(".", fn.final_edgeinfo_fname)
+        io.write_dframe(fullinfo, outputfilename)
+
+        return outputfilename
+
+    else:
+        if num_merge_tasks == 1:
+            return io.pull_file(storagestr, fn.final_edgeinfo_fname)
+
+        return io.pull_files(
+            [
+                os.path.join(storagestr, fn.tagged_final_edgeinfo_fname.format(i))
+                for i in range(num_merge_tasks)
+            ]
+        )
 
 
 def write_full_info(dframe, proc_url, tag=None):
