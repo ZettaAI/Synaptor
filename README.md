@@ -8,7 +8,7 @@ A package for processing voxelwise descriptors for connectomics, with a special 
 pip install synaptor
 ```
 ```
-pip install git+https://github.com/nicholasturner1/Synaptor
+pip install git+https://github.com/ZettaAI/Synaptor
 ```
 
 #### Troubleshooting
@@ -18,6 +18,18 @@ If python-igraph fails to install, you may need to install some required librari
 apt install libigraph0-dev libxml2-dev zlib1g-dev
 ```
 
+#### Output format
+Synaptor produces a dataframe with each segment described within a row
+
+`cleft_segid` - ID of the cleft segment described by the row
+`centroid_[xyz]_vx` - The voxel coordinate of the segment
+`bbox_begin_[xyz]` - The voxel coordinate of the (inclusive) beginning of the segment's bounding box
+`bbox_end_[xyz]` - The voxel coordinate of the (exclusive) end of the segment's bounding box
+`presyn_segid` - The ID of the presynaptic segment within the "base" segmentation used.
+`postsyn_segid` - The ID of the postsynaptic segment within the "base" segmentation used.
+`vx_count` - The size of the segment in voxels
+`centroid_[xyz]_nm` The centroid coordinate scaled by the supplied voxel resolution
+
 Contact
 -------
-* Nicholas Turner \<nturner@cs.princeton.edu\>
+* Nicholas Turner \<nturner@zetta.ai\>
