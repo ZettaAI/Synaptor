@@ -19,18 +19,17 @@ apt install libigraph0-dev libxml2-dev zlib1g-dev
 ```
 
 #### Output format
-Synaptor produces a dataframe with each segment described within a row
-
-`cleft_segid` - ID of the cleft segment described by the row
-`centroid_[xyz]_vx` - The voxel coordinate of the segment
-`bbox_begin_[xyz]` - The voxel coordinate of the (inclusive) beginning of the segment's bounding box
-`bbox_end_[xyz]` - The voxel coordinate of the (exclusive) end of the segment's bounding box
-`presyn_segid` - The ID of the presynaptic segment within the "base" segmentation used.
-`postsyn_segid` - The ID of the postsynaptic segment within the "base" segmentation used.
-`presyn_[xyz]_vx` - The voxel coordinate of the presynaptic "anchor point" for segmentation changes.
-`postsyn_[xyz]_vx` - The voxel coordinate of the postsynaptic "anchor point" for segmentation changes.
-`vx_count` - The size of the segment in voxels
-`centroid_[xyz]_nm` The centroid coordinate scaled by the supplied voxel resolution
+Synaptor produces a dataframe with each segment described by a row:
+`cleft_segid` - ID of the cleft segment described by the row.  
+`centroid_[xyz]_vx` - The voxel coordinate of the segment.  
+`bbox_begin_[xyz]` - The voxel coordinate of the (inclusive) beginning of the segment's bounding box.  
+`bbox_end_[xyz]` - The voxel coordinate of the (exclusive) end of the segment's bounding box.  
+`presyn_segid` - The ID of the presynaptic segment within the "base" segmentation used.  
+`postsyn_segid` - The ID of the postsynaptic segment within the "base" segmentation used.  
+`presyn_[xyz]_vx` - The voxel coordinate of the presynaptic "anchor point" for segmentation changes.  
+`postsyn_[xyz]_vx` - The voxel coordinate of the postsynaptic "anchor point" for segmentation changes.  
+`vx_count` - The size of the segment in voxels.  
+`centroid_[xyz]_nm` The centroid coordinate scaled by the supplied voxel resolution.  
 
 Contact
 -------
