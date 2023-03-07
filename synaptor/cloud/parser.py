@@ -38,6 +38,7 @@ def parse(filename: str):
     parsed["tempoutput"] = section.get("tempoutput", parsed["output"])
     parsed["baseseg"] = section.get("baseseg", None)
     parsed["image"] = section.get("image", None)
+    parsed["overlap_seg"] = section.get("overlap_seg", None)
 
     # [Dimensions]
     section = to_parse["Dimensions"]

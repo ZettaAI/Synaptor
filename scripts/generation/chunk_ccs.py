@@ -30,6 +30,7 @@ def main(
         num_merge_tasks=config["nummergetasks"],
         bboxes=bboxes,
         configfilename=config["filename"],
+        overlap_seg=config["overlap_seg"],
     )
 
 

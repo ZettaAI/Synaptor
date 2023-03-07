@@ -31,7 +31,8 @@ def create_connected_component_tasks(
     parallel: Optional[int] = 1,
     num_merge_tasks: Optional[int] = 1,
     bboxes: Optional[list[Bbox]] = None,
-    configfilename: Optional[str] = None
+    configfilename: Optional[str] = None,
+    overlap_seg: Optional[str] = None,
 ) -> Iterable:
     """Returns a iterator of partial cc_tasks."""
     print(bboxes)
@@ -64,17 +65,25 @@ def create_connected_component_tasks(
                     resolution=resolution,
                     storagedir=storagedir,
                     configfilename=configfilename,
+                    overlap_seg=overlap_seg,
                 )
 
     return ConnectedComponentsTaskIterator()
 
 
 def create_merge_ccs_task(
-    storagestr: str, size_thr: int, max_face_shape: tuple[int, int],
+    storagestr: str,
+    size_thr: int,
+    max_face_shape: tuple[int, int],
+    enforce_overlaps: Optional[bool] = False,
 ) -> partial:
     """Wraps a merge_ccs task in a partial fn."""
     return partial(
-        tasks_w_io.merge_ccs_task, storagestr, size_thr, max_face_shape=max_face_shape
+        tasks_w_io.merge_ccs_task,
+        storagestr,
+        size_thr,
+        max_face_shape=max_face_shape,
+        enforce_overlaps=enforce_overlaps,
     )
 
 
