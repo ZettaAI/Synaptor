@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 import json
 import warnings
-from typing import Optional, Union
+from typing import Optional
 from configparser import ConfigParser
 
 from .. import io

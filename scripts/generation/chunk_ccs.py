@@ -1,11 +1,8 @@
 """Task generation script for chunk connected components."""
 from __future__ import annotations
 
-import argparse
-from typing import Optional
-
-from taskqueue import TaskQueue
-from kombuworker import taskqueueworker as tqw
+from typing import Optional, Generator
+from functools import partial
 
 from synaptor import BBox3d
 from synaptor.cloud import task_creation as tc
