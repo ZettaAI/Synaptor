@@ -41,6 +41,7 @@ def cc_task(
     num_merge_tasks: Optional[int] = 100,
     timing_tag: Optional[str] = None,
     configfilename: Optional[str] = None,
+    overlap_seg: Optional[str] = None,
 ) -> None:
     """Atomic connected components task with standard IO."""
     start_time = time.time()
@@ -80,8 +81,18 @@ def cc_task(
         parallel=parallel,
     )
 
+    if overlap_seg is not None:
+        overlap_seg_data = timed(
+            f"Reading overlap segmentation data from: {overlap_seg}",
+            io.read_cloud_volume_chunk,
+            overlap_seg,
+            chunk_bounds,
+            resolution=resolution,
+            parallel=parallel,
+        )
+
     ccs, continuations, seg_info = tasks.cc_task(
-        desc_vol, cc_thresh, sz_thresh, offset=chunk_begin
+        desc_vol, cc_thresh, sz_thresh, offset=chunk_begin, overlap_seg=overlap_seg_data
     )
 
     # Parsing provenance information for CirrusVolume
@@ -185,6 +196,7 @@ def merge_ccs_task(
     size_thr: int,
     max_face_shape: tuple[int, int],
     timing_tag: Optional[str] = None,
+    enforce_overlaps: Optional[bool] = False,
 ) -> None:
     """Merging atomic connected component results without parallelism."""
     start_time = time.time()
@@ -201,7 +213,11 @@ def merge_ccs_task(
 
     # Processing
     cons_cleft_info, chunk_id_maps = tasks.merge_ccs_task(
-        cont_info_arr, cleft_info_arr, size_thr, max_face_shape
+        cont_info_arr,
+        cleft_info_arr,
+        size_thr,
+        max_face_shape,
+        enforce_overlaps=enforce_overlaps,
     )
 
     timed(

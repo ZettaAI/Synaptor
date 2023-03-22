@@ -20,7 +20,10 @@ def main(
     config = parser.parse(configfilename)
 
     task = tc.create_merge_ccs_task(
-        config["storagestrs"][0], config["szthresh"], config["maxfaceshape"]
+        config["storagestrs"][0],
+        config["szthresh"],
+        config["maxfaceshape"],
+        enforce_overlaps=config["overlap_seg"] is not None,
     )
 
     queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)

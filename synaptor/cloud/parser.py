@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 import json
 import warnings
-from typing import Optional, Union
+from typing import Optional
 from configparser import ConfigParser
 
 from .. import io
@@ -38,6 +38,7 @@ def parse(filename: str):
     parsed["tempoutput"] = section.get("tempoutput", parsed["output"])
     parsed["baseseg"] = section.get("baseseg", None)
     parsed["image"] = section.get("image", None)
+    parsed["overlap_seg"] = section.get("overlap_seg", None)
 
     # [Dimensions]
     section = to_parse["Dimensions"]

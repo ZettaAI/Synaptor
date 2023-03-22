@@ -21,6 +21,7 @@ parser.add_argument("size_thr", type=int)
 parser.add_argument("--max_face_shape", type=int,
                     nargs="+", default=(1024, 1024))
 parser.add_argument("--timing_tag", default=None)
+parser.add_argument("--enforce_overlaps", action="store_true")
 
 args = parser.parse_args()
 print(vars(args))
