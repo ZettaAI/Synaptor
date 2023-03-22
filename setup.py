@@ -5,6 +5,11 @@ from setuptools.command.build_ext import build_ext
 
 
 __version__ = "0.0.3"
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(PACKAGE_DIR, 'requirements.txt')) as f:
+    install_requires = f.read().splitlines()
+    install_requires = [l for l in install_requires if not l.startswith('#')]
 
 
 #==========================================================
@@ -111,11 +116,7 @@ setup(
     url='https://github.com/nicholasturner1/Synaptor',
     packages=setuptools.find_packages(),
     ext_modules=ext_modules,
-    install_requires=['numpy', 'scipy', 'python-igraph', 'pandas', 'h5py',
-                      'cloud-volume', 'task-queue', 'torch==1.13.0',
-                      'torchvision==0.14.1', 'future', 'pybind11>=2.2',
-                      'psycopg2-binary', 'sqlalchemy', 'pytest',
-                      'connected-components-3d'],
+    install_requires=install_requires,
     cmdclass={'build_ext': BuildExt},
     zip_safe=False
 )
