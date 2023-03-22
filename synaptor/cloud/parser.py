@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import re
+import json
 import warnings
-from typing import Optional
+from typing import Optional, Union
 from configparser import ConfigParser
 
 from .. import io
@@ -16,77 +17,82 @@ SUPPORTED_WORKSPACES = ["Database", "File"]
 def parse(filename: str):
     """Parses a configuration file."""
 
-    parser = ConfigParser()
-    parser.read(filename)
+    if filename.endswith("ini") or filename.endswith("cfg"):
+        to_parse = ConfigParser()
+        to_parse.read(filename)
+    elif filename.endswith("json"):
+        with open(filename) as f:
+            to_parse = json.load(f)
+    else:
+        raise ValueError(f"unrecognized file type: {filename}")
 
-    assert parser.get("Workflow", "workflowtype") in SUPPORTED_WORKFLOWS
-    assert parser.get("Workflow", "workspacetype") in SUPPORTED_WORKSPACES
+    assert to_parse["Workflow"]["workflowtype"] in SUPPORTED_WORKFLOWS
+    assert to_parse["Workflow"]["workspacetype"] in SUPPORTED_WORKSPACES
 
-    conf = dict()
+    parsed = dict()
 
     # [Volumes]
-    conf["descriptor"] = parser.get("Volumes", "descriptor")
-    conf["output"] = parser.get("Volumes", "output")
-    conf["tempoutput"] = parser.get("Volumes", "tempoutput", fallback=conf["output"])
-    conf["baseseg"] = parser.get("Volumes", "baseseg", fallback=None)
-    conf["image"] = parser.get("Volumes", "image", fallback=None)
+    section = to_parse["Volumes"]
+    parsed["descriptor"] = section.get("descriptor")
+    parsed["output"] = section.get("output")
+    parsed["tempoutput"] = section.get("tempoutput", parsed["output"])
+    parsed["baseseg"] = section.get("baseseg", None)
+    parsed["image"] = section.get("image", None)
 
     # [Dimensions]
-    conf["voxelres"] = parse_tuple(parser.get("Dimensions", "voxelres"))
-    conf["startcoord"] = parse_tuple(parser.get("Dimensions", "startcoord"))
-    conf["volshape"] = parse_tuple(parser.get("Dimensions", "volshape"))
-    conf["chunkshape"] = parse_tuple(parser.get("Dimensions", "chunkshape"))
-    conf["blockshape"] = parse_tuple(
-        parser.get("Dimensions", "blockshape", fallback="1, 1, 1")
-    )
-    conf["patchshape"] = parse_tuple(
-        parser.get("Dimensions", "patchshape", fallback="1, 1, 1")
-    )
+    section = to_parse["Dimensions"]
+    parsed["voxelres"] = parse_tuple(section.get("voxelres"))
+    parsed["startcoord"] = parse_tuple(section.get("startcoord"))
+    parsed["volshape"] = parse_tuple(section.get("volshape"))
+    parsed["chunkshape"] = parse_tuple(section.get("chunkshape"))
+    parsed["blockshape"] = parse_tuple(section.get("blockshape", "1, 1, 1"))
+    parsed["patchshape"] = parse_tuple(section.get("patchshape", "1, 1, 1"))
 
     # Additional field inferred from chunk_shape
-    conf["maxfaceshape"] = infer_max_face_shape(conf["chunkshape"])
-    check_shapes(conf["volshape"], conf["chunkshape"], conf["blockshape"])
+    parsed["maxfaceshape"] = infer_max_face_shape(parsed["chunkshape"])
+    check_shapes(parsed["volshape"], parsed["chunkshape"], parsed["blockshape"])
 
     # [Parameters]
-    conf["ccthresh"] = parser.getfloat("Parameters", "ccthresh")
-    conf["szthresh"] = parser.getint("Parameters", "szthresh", fallback=0)
-    conf["dustthresh"] = parser.getint("Parameters", "dustthresh", fallback=0)
-    conf["mergethresh"] = parser.getint("Parameters", "mergethresh", fallback=0)
-    conf["nummergetasks"] = parser.getint("Parameters", "nummergetasks", fallback=1)
+    section = to_parse["Parameters"]
+    parsed["ccthresh"] = float(section.get("ccthresh", 0.01))
+    parsed["szthresh"] = int(section.get("szthresh", 0))
+    parsed["dustthresh"] = int(section.get("dustthresh", 0))
+    parsed["mergethresh"] = int(section.get("mergethresh", 0))
+    parsed["nummergetasks"] = int(section.get("nummergetasks", 1))
 
     # [Workflow]
-    conf["workflowtype"] = parser.get(
-        "Workflow", "workflowtype", fallback="Segmentation"
-    )
-    conf["workspacetype"] = parser.get("Workflow", "workspacetype", fallback="File")
-    conf["queueurl"] = parser.get("Workflow", "queueurl", fallback=None)
-    conf["queuename"] = parser.get("Workflow", "queuename", fallback=None)
-    conf["connectionstr"] = parser.get(
-        "Workflow", "connectionstr", fallback="STORAGE_FROM_FILE"
-    )
-    conf["storagedir"] = parser.get("Workflow", "storagedir")
-    conf["normcloudpath"] = parser.get("Workflow", "normcloudpath", fallback=None)
-    conf["storagestrs"] = get_storagestrs(parser)
-    conf["maxclustersize"] = parser.getint("Workflow", "maxclustersize")
+    section = to_parse["Workflow"]
+    parsed["workflowtype"] = section.get("workflowtype", "Segmentation")
+    parsed["workspacetype"] = section.get("workspacetype", "File")
+    parsed["queueurl"] = section.get("queueurl")
+    parsed["queuename"] = section.get("queuename")
+    parsed["connectionstr"] = section.get("connectionstr", "STORAGE_FROM_FILE")
+    parsed["storagedir"] = section["storagedir"]
+    parsed["normcloudpath"] = section.get("normcloudpath")
+    parsed["maxclustersize"] = int(section.get("maxclustersize", 0))
+    parsed["storagestrs"] = get_storagestrs(parsed)
 
     # [Remapped segmentation]
-    conf["aggscratchpath"] = parser.get(
-        "Remapped segmentation", "aggscratchpath", fallback=None
-    )
-    conf["aggchunksize"] = parse_tuple(
-        parser.get("Remapped segmentation", "aggchunksize", fallback=None)
-    )
-    conf["aggmaxmip"] = parser.get("Remapped segmentation", "aggmaxmip", fallback=None)
+    if "Remapped segmentation" in to_parse:
+        section = to_parse["Remapped segmentation"]
+        parsed["aggscratchpath"] = section.get("aggscratchpath")
+        parsed["aggchunksize"] = parse_tuple(section.get("aggchunksize"))
+        parsed["aggmaxmip"] = section.get("aggmaxmip")
+    else:
+        parsed["aggscratchpath"] = None
+        parsed["aggchunksize"] = None
+        parsed["aggmaxmip"] = None
 
     # [Provenance]
-    conf["sources"] = get_sources(conf)
-    conf["motivation"] = parser.get("Provenance", "motivation")
+    section = to_parse["Provenance"]
+    parsed["sources"] = get_sources(parsed)
+    parsed["motivation"] = section.get("motivation")
 
     # Some tasks need to re-parse the config file to get provenance info
     # for CirrusVolume
-    conf["filename"] = filename
+    parsed["filename"] = filename
 
-    return conf
+    return parsed
 
 
 def parse_tuple(field: Optional[str] = None):
@@ -102,19 +108,15 @@ def infer_max_face_shape(chunk_shape: tuple[int, int, int]):
     return tuple(sorted(chunk_shape)[1:])
 
 
-def get_storagestrs(parser: ConfigParser):
+def get_storagestrs(parsed: ConfigParser):
     """Extracts the storage strings depending upon the workspace type."""
-    workspacetype = parser.get("Workflow", "workspacetype")
+    if parsed["workspacetype"] == "Database":
+        storagestr = parsed["connectionstr"]
 
-    if workspacetype == "Database":
-        storagestr = parser.get(
-            "Workflow", "connectionstr", fallback="STORAGE_FROM_FILE"
-        )
+    elif parsed["workspacetype"] == "File":
+        storagestr = parsed["storagedir"]
 
-    elif workspacetype == "File":
-        storagestr = parser.get("Workflow", "storagedir")
-
-    aux_storagestr = parser.get("Workflow", "storagedir")
+    aux_storagestr = parsed["storagedir"]
 
     return storagestr, aux_storagestr
 
@@ -170,13 +172,13 @@ def scrubconnstr(connstr: str) -> str:
     return connstr
 
 
-def get_sources(config: ConfigParser):
+def get_sources(parsed: dict):
     """Extracts the sources of the results using the specified workflow."""
-    workflowtype = config["workflowtype"]
+    workflowtype = parsed["workflowtype"]
 
     if workflowtype == "Segmentation":
-        return [config["descriptor"]]
+        return [parsed["descriptor"]]
     elif workflowtype == "Segmentation+Assignment":
-        return [config["descriptor"], config["image"], config["baseseg"]]
+        return [parsed["descriptor"], parsed["image"], parsed["baseseg"]]
     else:
         raise ValueError(f"Unknown workflowtype: {workflowtype}")

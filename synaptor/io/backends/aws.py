@@ -3,6 +3,7 @@
 import os
 import re
 import glob
+import math
 import subprocess
 
 import cloudvolume  # Piggybacking on cloudvolume's secrets
@@ -39,7 +40,7 @@ def pull_files(remote_paths, check=True,
 
 
 def pull_files_in_batches(paths, check=True, batch_size=1000):
-    num_batches = len(paths) / batch_size + 1
+    num_batches = int(math.ceil(len(paths) / batch_size))
 
     local_paths = list()
     for i in range(num_batches):
