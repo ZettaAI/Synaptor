@@ -7,9 +7,11 @@ import itertools
 import importlib
 import types
 
-import torch
 import h5py
+import onnx
+import onnx_tensorrt.backend as backend
 import pandas as pd
+import torch
 
 
 def pull_file(fname):
@@ -56,12 +58,30 @@ def write_dframe(dframe, path, header=True, index=True):
     dframe.to_csv(path, index=index, header=header)
 
 
-def read_network(net_fname, chkpt_fname):
-    """ Read a PyTorch model from disk. """
-    model = load_source(net_fname).InstantiatedModel
-    model.load_state_dict(torch.load(chkpt_fname))
+class ONNXModel:
+    def __init__(self, model_filename):
+        self.model = onnx.load(model_filename)
+        self.engine = backend.prepare(self.model, enable_fp16=False)
 
-    return model.cuda()
+    def __call__(self, input_patch):
+        self.engine.run(input_patch)
+
+
+def read_network(net_fname, chkpt_fname=None, model_type="pytorch"):
+    """Read a model from disk.
+
+    Pass a net filename only if loading an ONNX model
+    """
+    if model_type == "pytorch":
+        model = load_source(net_fname).InstantiatedModel
+        model.load_state_dict(torch.load(chkpt_fname))
+        return model.cuda()
+
+    elif model_type == "onnx":
+        return ONNXModel(net_fname)
+
+    else:
+        raise ValueError(f"unknown model type: {model_type}")
 
 
 def write_network(net, path):
