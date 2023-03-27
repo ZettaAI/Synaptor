@@ -59,12 +59,13 @@ def write_dframe(dframe, path, header=True, index=True):
 
 
 class ONNXModel:
+    """A simple wrapper around an ONNX model for inference."""
     def __init__(self, model_filename):
         self.model = onnx.load(model_filename)
         self.engine = backend.prepare(self.model, enable_fp16=False)
 
     def __call__(self, input_patch):
-        self.engine.run(input_patch)
+        return self.engine.run(input_patch)
 
 
 def read_network(net_fname, chkpt_fname=None, model_type="pytorch"):
