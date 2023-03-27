@@ -330,14 +330,25 @@ def infer_patch(net, img_p, psd_p):
 
     Returns 4d output
     """
+    # ONNX Models are wrapped in a custom class (ONNXModel in io/backends/local.py)
+    # These classes take numpy arrays as args instead of torch tensors, and return
+    # numpy arrays too.
+    net_takes_torch_tensors = isinstance(net, torch.nn.Module)
+
     with torch.no_grad():
         # formatting
         net_input = np.concatenate((img_p, psd_p), axis=1).astype("float32")
-        net_input = to_tensor(net_input, volatile=True)
+        if net_takes_torch_tensors:
+            net_input = to_tensor(net_input, volatile=True)
 
         # network has only one output
         # and batch size = 1
-        output = torch.sigmoid(net(net_input)[0])[0, ...]
+        raw_output = net(net_input)[0][0, ...]
+
+        if not net_takes_torch_tensors:
+            raw_output = to_tensor(raw_output, volatile=True)
+
+        output = torch.sigmoid(raw_output)
 
     return output
 

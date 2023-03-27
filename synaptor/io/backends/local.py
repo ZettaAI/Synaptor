@@ -68,21 +68,21 @@ class ONNXModel:
         return self.engine.run(input_patch)
 
 
-def read_network(net_fname, chkpt_fname=None, model_type="pytorch"):
+def read_network(net_fname, chkpt_fname=None):
     """Read a model from disk.
 
-    Pass a net filename only if loading an ONNX model
+    The chkpt_fname argument will be ignored if the net filename ends in "onnx".
     """
-    if model_type == "pytorch":
+    if net_fname.endswith("py"):  # raw PyTorch model
         model = load_source(net_fname).InstantiatedModel
         model.load_state_dict(torch.load(chkpt_fname))
         return model.cuda()
 
-    elif model_type == "onnx":
+    elif net_fname.endswith("onnx"):  # exported ONNX model
         return ONNXModel(net_fname)
 
     else:
-        raise ValueError(f"unknown model type: {model_type}")
+        raise ValueError(f"unknown model type: {net_fname}")
 
 
 def write_network(net, path):
