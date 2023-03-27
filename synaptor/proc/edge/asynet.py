@@ -337,17 +337,21 @@ def infer_patch(net, img_p, psd_p):
 
     with torch.no_grad():
         # formatting
+        print("concatenate")
         net_input = np.concatenate((img_p, psd_p), axis=1).astype("float32")
         if net_takes_torch_tensors:
             net_input = to_tensor(net_input, volatile=True)
 
         # network has only one output
         # and batch size = 1
+        print("forward pass")
+        print(net_input.shape)
         raw_output = net(net_input)[0][0, ...]
 
         if not net_takes_torch_tensors:
             raw_output = to_tensor(raw_output, volatile=True)
 
+        print("sigmoid")
         output = torch.sigmoid(raw_output)
 
     return output
