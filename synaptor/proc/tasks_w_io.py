@@ -457,6 +457,7 @@ def edge_task(
     base_res_begin=None,
     base_res_end=None,
     parallel=1,
+    modelpath=None,
     num_merge_tasks=None,
     storagedir=None,
     normcloudpath=None,
@@ -558,7 +559,10 @@ def edge_task(
         )
 
     assoc_net = timed(
-        "Reading association network", taskio.read_network_from_proc, storagedir
+        "Reading association network",
+        taskio.read_network_from_proc,
+        storagedir,
+        modelpath,
     ).cuda()
 
     chunk_id_map = timed(

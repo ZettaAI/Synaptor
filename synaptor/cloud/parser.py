@@ -63,6 +63,7 @@ def parse(filename: str):
 
     # [Workflow]
     section = to_parse["Workflow"]
+    parsed["modelpath"] = section.get("modelpath", None)
     parsed["workflowtype"] = section.get("workflowtype", "Segmentation")
     parsed["workspacetype"] = section.get("workspacetype", "File")
     parsed["queueurl"] = section.get("queueurl")

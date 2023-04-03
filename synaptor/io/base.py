@@ -199,7 +199,7 @@ def write_edge_csv(edges, path_or_head, basename=None, delim=";"):
         os.remove(local_fname)
 
 
-def read_network(net_fname, chkpt_fname):
+def read_network(net_fname, chkpt_fname=None):
     """
     Reads a saved Torch network - paths can specify remote
     storage in Google Cloud or AWS S3
@@ -207,7 +207,7 @@ def read_network(net_fname, chkpt_fname):
     if is_remote_path(net_fname):
         net_fname = pull_file(net_fname)
 
-    if is_remote_path(chkpt_fname):
+    if chkpt_fname is not None and is_remote_path(chkpt_fname):
         chkpt_fname = pull_file(chkpt_fname)
 
     return bck.local.read_network(net_fname, chkpt_fname)

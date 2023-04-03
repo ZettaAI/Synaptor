@@ -67,6 +67,9 @@ class ONNXModel:
     def __call__(self, input_patch):
         return self.engine.run(input_patch)
 
+    def cuda(self):
+        pass
+
 
 def read_network(net_fname, chkpt_fname=None):
     """Read a model from disk.

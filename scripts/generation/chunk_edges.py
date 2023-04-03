@@ -39,6 +39,7 @@ def main(
         storagedir=config["storagestrs"][1],
         normcloudpath=config["normcloudpath"],
         resolution=config["voxelres"],
+        modelpath=config["modelpath"],
         aggscratchpath=config["aggscratchpath"],
         aggchunksize=config["aggchunksize"],
         aggmaxmip=config["aggmaxmip"],
