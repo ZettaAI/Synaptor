@@ -68,7 +68,7 @@ class ONNXModel:
         return self.engine.run(input_patch)
 
     def cuda(self):
-        pass
+        return self
 
 
 def read_network(net_fname, chkpt_fname=None):
