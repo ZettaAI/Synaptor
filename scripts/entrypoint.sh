@@ -19,6 +19,7 @@ case $1 in
     chunk_seg_map)    /usr/bin/env python -u base/chunk_seg_map.py ${@:2} ;;
     merge_seginfo)    /usr/bin/env python -u base/merge_seginfo.py ${@:2} ;;
     chunk_edges)      /usr/bin/env python -u base/chunk_edges.py ${@:2} ;;
+    merge_edges)      /usr/bin/env python -u base/merge_edges.py ${@:2} ;;
     pick_edge)        /usr/bin/env python -u base/pick_edge.py ${@:2} ;;
     merge_dups)       /usr/bin/env python -u base/merge_dups.py ${@:2} ;;
     remap)            /usr/bin/env python -u base/remap.py ${@:2} ;;
@@ -44,6 +45,7 @@ case $1 in
             chunk_seg_map)         /usr/bin/env python -u generation/chunk_seg_map.py ${@:3} ;;
             merge_seginfo)         /usr/bin/env python -u generation/merge_seginfo.py ${@:3} ;;
             chunk_edges)           /usr/bin/env python -u generation/chunk_edges.py ${@:3} ;;
+            merge_edges)           /usr/bin/env python -u generation/merge_edges.py ${@:3} ;;
             pick_edge)             /usr/bin/env python -u generation/pick_edge.py ${@:3} ;;
             merge_dups)            /usr/bin/env python -u generation/merge_dups.py ${@:3} ;;
             merge_dup_maps)        /usr/bin/env python -u generation/merge_dup_maps.py ${@:3} ;;

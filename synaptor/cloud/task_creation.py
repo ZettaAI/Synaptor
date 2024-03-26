@@ -215,6 +215,17 @@ def create_chunk_edges_tasks(
     return ChunkEdgesTaskIterator()
 
 
+def create_merge_edges_task(
+    voxelres: tuple[float, float, float],
+    mergethresh: float,
+    szthresh: int,
+    storagestr: str
+) -> partial:
+    return partial(
+        tasks_w_io.merge_edges_task, voxelres, mergethresh, szthresh, storagestr
+    )
+
+
 def create_pick_edge_tasks(
     storagestr: str, num_merge_tasks: int
 ) -> Generator[partial, None, None]:
