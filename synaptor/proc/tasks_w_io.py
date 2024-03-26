@@ -81,7 +81,7 @@ def cc_task(
         parallel=parallel,
     )
 
-    if overlap_seg is not None:
+    if overlap_seg and overlap_seg != "None":
         overlap_seg_data = timed(
             f"Reading overlap segmentation data from: {overlap_seg}",
             io.read_cloud_volume_chunk,
@@ -90,6 +90,8 @@ def cc_task(
             resolution=resolution,
             parallel=parallel,
         )
+    else:
+        overlap_seg_data = None
 
     ccs, continuations, seg_info = tasks.cc_task(
         desc_vol, cc_thresh, sz_thresh, offset=chunk_begin, overlap_seg=overlap_seg_data
