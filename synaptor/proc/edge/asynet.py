@@ -27,11 +27,27 @@ RECORD_SCHEMA = [cn.seg_id, cn.presyn_id, cn.postsyn_id,
 SCHEMA_W_ROOTS = RECORD_SCHEMA + [cn.presyn_basin, cn.postsyn_basin]
 
 
-def infer_edges(net, img, cleft, seg, patchsz, root_seg=None, offset=(0, 0, 0),
-                cleft_ids=None, dil_param=5, loc_type="centroid",
-                samples_per_cleft=None, score_type="avg", alpha=1,
-                pre_type=None, post_type=None, assign_type="max",
-                thresh=None, thresh2=None):
+def infer_edges(
+    net,
+    img,
+    cleft,
+    seg,
+    patchsz,
+    root_seg=None,
+    offset=(0, 0, 0),
+    cleft_ids=None,
+    dil_param=5,
+    loc_type="centroid",
+    samples_per_cleft=None,
+    score_type="avg",
+    alpha=1,
+    pre_type=None,
+    post_type=None,
+    assign_type="max",
+    thresh=None,
+    thresh2=None,
+    restrict_segments=True
+):
     """
     Runs a trained network over the synaptic clefts within the dataset
     and infers the synaptic partners involved at each synapse
@@ -62,7 +78,11 @@ def infer_edges(net, img, cleft, seg, patchsz, root_seg=None, offset=(0, 0, 0),
 
             img_p, clf_p, seg_p = get_patches(img, cleft, seg, box, cid)
 
-            segids = find_close_segments(clf_p, seg_p, dil_param)
+            if restrict_segments:
+                segids = find_close_segments(clf_p, seg_p, dil_param)
+            else:
+                segids = seg_utils.nonzero_unique_ids.unique(seg_p)
+
             if len(segids) == 0:
                 print(f"skipping {cid}, no close segments")
                 continue

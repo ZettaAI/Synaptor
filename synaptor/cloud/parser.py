@@ -73,6 +73,10 @@ def parse(filename: str):
     parsed["normcloudpath"] = section.get("normcloudpath")
     parsed["maxclustersize"] = int(section.get("maxclustersize", 0))
     parsed["storagestrs"] = get_storagestrs(parsed)
+    parsed["restrict_segments"] = (
+        # janky "getboolean" bc we have to use dicts here too
+        section.get("restrict_segments", True) not in ["false", "False"]
+    )
 
     # [Remapped segmentation]
     if "Remapped segmentation" in to_parse:

@@ -452,6 +452,7 @@ def edge_task(
     patchsz,
     storagestr,
     samples_per_cleft=2,
+    restrict_segments=True,
     dil_param=5,
     root_seg_cvname=None,
     resolution=(4, 4, 40),
@@ -593,6 +594,7 @@ def edge_task(
         id_map=chunk_id_map,
         root_seg=None,
         samples_per_cleft=samples_per_cleft,
+        restrict_segments=restrict_segments,
         dil_param=dil_param,
         num_merge_tasks=num_merge_tasks,
     )

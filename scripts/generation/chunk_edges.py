@@ -36,6 +36,7 @@ def main(
         chunkshape=config["chunkshape"],
         startcoord=config["startcoord"],
         patchsz=config["patchshape"],
+        restrict_segments=config["restrict_segments"],
         storagedir=config["storagestrs"][1],
         normcloudpath=config["normcloudpath"],
         resolution=config["voxelres"],
