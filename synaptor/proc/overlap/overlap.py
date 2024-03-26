@@ -25,7 +25,10 @@ def find_max_overlaps(overlap_mat):
     cs = list(max_overlaps[k] for k in rs)
     vs = list(maxima[k] for k in rs)
 
-    return sparse.coo_matrix((vs, (rs, cs)))
+    if len(rs) == 0 and len(cs) == 0:
+        return sparse.coo_matrix((vs, (rs, cs)), shape=(0, 0))
+    else:
+        return sparse.coo_matrix((vs, (rs, cs)))
 
 
 def convert_to_dict(overlap_mat):
