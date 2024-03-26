@@ -363,7 +363,7 @@ def merge_edges_task(
     )
 
     full_df, merged_id_map = merge_duplicates_task(
-        cleft_info, merged_edge_info, voxel_res, dist_thr, size_thr
+        cleft_info, merged_edge_info, dist_thr, voxel_res, size_thr
     )
 
     return full_df, merged_id_map, merged_edge_info
