@@ -23,7 +23,7 @@ from .edgeinfo import read_all_chunk_edge_infos
 from .edgeinfo import read_merged_edge_info, write_merged_edge_info
 
 from . import fullinfo
-from .fullinfo import read_full_info, write_full_info
+from .fullinfo import read_full_info, write_full_info, pull_all_full_info, send_full_info
 
 from . import idmap
 from .idmap import read_chunk_id_map, write_chunk_id_map

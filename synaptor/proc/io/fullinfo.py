@@ -3,6 +3,7 @@
 
 from sqlalchemy import select
 
+import os
 from ... import io
 from .. import colnames as cn
 from . import filenames as fn
@@ -47,3 +48,30 @@ def write_full_info(dframe, proc_url, tag=None):
         else:
             io.write_dframe(dframe, proc_url,
                             fn.tagged_final_edgeinfo_fname.format(tag))
+
+
+def pull_all_full_info(storagestr: str, num_merge_tasks: int) -> list[str]:
+    """Downloads all of the info dataframe generated from parallel merge tasks."""
+    if io.is_db_url(storagestr):
+        raise Exception(
+            "not implemented for DB io - you can read the full map directly"
+        )
+
+    else:
+        remote_filenames = [
+            os.path.join(storagestr, fn.tagged_final_edgeinfo_fname.format(i))
+            for i in range(num_merge_tasks)
+        ]
+
+        return io.pull_files(remote_filenames)
+
+def send_full_info(filename: str, storagestr: str) -> None:
+    """Sends a duplicate map file to storage."""
+    if io.is_db_url(storagestr):
+        raise Exception(
+            "not implemented for DB io - you can read the full map directly"
+        )
+
+    else:
+        remote_filename = os.path.join(storagestr, fn.final_edgeinfo_fname)
+        io.send_file(filename, remote_filename)

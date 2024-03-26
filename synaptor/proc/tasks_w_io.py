@@ -807,6 +807,28 @@ def merge_dup_maps_task(
     )
     os.remove(tempfilename)
 
+    full_info_filenames = timed(
+        "Downloading duplicate maps from storage",
+        taskio.pull_all_full_info,
+        storagestr,
+        num_merge_tasks,
+    )
+
+    tempfilename = io.utils.temp_path()
+    timed(
+        "Concatenating duplicate map files",
+        io.utils.concat_csvs,
+        full_info_filenames,
+        tempfilename,
+    )
+
+    timed(
+        "Writing full map to storage",
+        taskio.send_full_info,
+        tempfilename,
+        storagestr,
+    )
+    os.remove(tempfilename)
 
 @queueable
 def remap_ids_task(
