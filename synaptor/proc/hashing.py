@@ -28,7 +28,7 @@ def basehash(v, seed=54321, verbose=False):
 
 
 def pack_many(v, verbose=False):
-    if isinstance(v, collections.Iterable):
+    if isinstance(v, collections.abc.Iterable):
         if verbose:
             print(",".join(map(str, v)))
         return int.from_bytes(",".join(map(str, v)).encode(),
