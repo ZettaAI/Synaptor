@@ -5,8 +5,10 @@ import os
 
 from ... import io
 from . import filenames as fn
+from functools import cache
 
 
+@cache
 def read_network_from_proc(proc_dir_path, modelpath=None):
     if modelpath is None:
         model_fname = os.path.join(proc_dir_path,
