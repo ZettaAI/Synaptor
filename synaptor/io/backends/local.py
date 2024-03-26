@@ -12,6 +12,22 @@ import onnx
 import onnx_tensorrt.backend as backend
 import pandas as pd
 import torch
+from functools import cache
+
+@cache
+def ensure_folders_exist(fname):
+    directory = os.path.dirname(fname)
+
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)
+            print(f"Created directory: {directory}")
+            return True
+        except OSError as e:
+            print(f"Error creating directory: {directory} - {e}")
+            return False
+    else:
+        return True
 
 
 def pull_file(fname):
@@ -32,6 +48,7 @@ def pull_directory(dirname):
 
 def send_file(src, dst):
     """ Copy a file. """
+    ensure_folders_exist(dst)
     shutil.copyfile(src, dst)
 
 
@@ -55,6 +72,7 @@ def read_dframe(path, chunksize=None):
 
 def write_dframe(dframe, path, header=True, index=True):
     """ Write a dataframe to local disk. """
+    ensure_folders_exist(path)
     dframe.to_csv(path, index=index, header=header)
 
 
@@ -90,6 +108,7 @@ def read_network(net_fname, chkpt_fname=None):
 
 def write_network(net, path):
     """ Write a PyTorch model to disk. """
+    ensure_folders_exist(path)
     torch.save(net, path)
 
 
@@ -108,6 +127,7 @@ def read_h5(fname, dset_name="/main"):
 
 def write_h5(data, fname, dset_name="/main", chunk_size=None):
     """ Write a data array to a specific dataset within an hdf5. """
+    ensure_folders_exist(fname)
     with h5py.File(fname, "w") as f:
 
         if chunk_size is None:
@@ -147,6 +167,7 @@ def write_edge_csv(edges, fname, delim=";"):
     Write a three-field csv file formatted as
     (cleft_id, presyn_segid, postsyn_segid).
     """
+    ensure_folders_exist(fname)
     with open(fname, "w+") as f:
         for (cleft_id, presyn_id, postsyn_id) in edges:
             content = delim.join(map(str, (cleft_id, presyn_id, postsyn_id)))
