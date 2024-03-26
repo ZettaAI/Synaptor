@@ -50,7 +50,8 @@ def place_anchor_pts(edge_df, seg, clf, voxel_res=[4, 4, 40],
 
 def place_anchor_pt(cleft_id, seg_id, clf, seg,
                     bb=None, surfaces=None, verbose=False,
-                    voxel_res=[4, 4, 40], min_box_width=[100, 100, 5]):
+                    voxel_res=[4, 4, 40], min_box_width=[100, 100, 5],
+                    offset=(0, 0, 0)):
 
     if verbose:
         print(f"Placing anchor for cleft {cleft_id} on segment {seg_id}")
@@ -79,7 +80,7 @@ def place_anchor_pt(cleft_id, seg_id, clf, seg,
 
     base_pt = closest_pt_to_seg(cleft_id, seg_id, clf_v, seg_v, voxel_res)
     shifted = shift_pt(base_pt, seg_id, seg_v, min_box_width, voxel_res)
-    anchor_pt = tuple(shifted + bb.min())
+    anchor_pt = tuple(shifted + bb.min() + offset)
 
     return anchor_pt
 
