@@ -1,4 +1,4 @@
-FROM ranlu/pytorch_base:1.13
+FROM ranlu/pytorch_base:2.2
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential git \
