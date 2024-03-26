@@ -181,7 +181,7 @@ def infer_single_patch(net, img, cleft, seg, patchsz,
 
     cleft_id = cleft[loc] if cleft_id is None else cleft_id
 
-    box = containing_box(patchsz, cleft, loc)
+    box = bbox.containing_box(patchsz, cleft, loc)
 
     img_p, clf_p, seg_p = get_patches(img, cleft, seg, box, cleft_id)
 
@@ -240,7 +240,7 @@ def pick_cleft_bboxes(cleft, cleft_id, patchsz, cleft_boxes):
         locs = list(zip(*np.nonzero(cleft_mask)))
 
         loc = random.choice(locs)
-        box = containing_box(patchsz, cleft_mask, loc)
+        box = bbox.containing_box(patchsz, cleft_mask, loc)
         bboxes.append(box)
 
         cleft_mask[box.index()] = False
