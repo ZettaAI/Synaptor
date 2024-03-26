@@ -9,13 +9,37 @@ from functools import wraps
 
 from taskqueue import queueable
 
+import re
+import requests
+from urllib.parse import urlparse
+
 from . import backends as bck
 from . import utils
 
 
 GCLOUD_REGEXP = bck.gcloud.REGEXP
 AWS_REGEXP = bck.aws.REGEXP
+HTTPS_REGEXP = re.compile(r"http(s)?://")
 DB_REGEXPS = bck.sqlalchemy.REGEXPS
+
+
+def download_url(url, alwayspull=False):
+    parsed_url = urlparse(url)
+    filename = parsed_url.path.split('/')[-1]
+
+    if not alwayspull and os.path.isfile(filename):
+        return filename
+
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(filename, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"File downloaded successfully as {filename}")
+        return filename
+    else:
+        print(f"Failed to download file, status code: {response.status_code}")
+        return None
 
 
 def pull_file(path):
@@ -27,6 +51,8 @@ def pull_file(path):
         return bck.gcloud.pull_file(path)
     elif AWS_REGEXP.match(path):
         return bck.aws.pull_file(path)
+    elif HTTPS_REGEXP.match(path):
+        return download_url(path)
     else:  # local
         return bck.local.pull_file(path)
 
@@ -311,4 +337,4 @@ def create_index(*args, **kwargs):
 
 def is_remote_path(uri):
     """ Whether a uri describes a cloud backend. """
-    return GCLOUD_REGEXP.match(uri) or AWS_REGEXP.match(uri)
+    return GCLOUD_REGEXP.match(uri) or AWS_REGEXP.match(uri) or HTTPS_REGEXP.match(uri)
