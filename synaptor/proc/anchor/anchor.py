@@ -59,7 +59,6 @@ def place_anchor_pt(cleft_id, seg_id, clf, seg,
         return (-1,-1,-1)
     if bb is None:
         bb = seg_utils.bounding_boxes(clf)[cleft_id]
-    clf_b = clf[bb.index()]
 
     bb = bb.grow_by(min_box_width)
     bb = bbox.shift_to_bounds(bb, seg.shape)
