@@ -590,6 +590,7 @@ def edge_task(
         seg,
         assoc_net,
         patchsz,
+        voxel_res=resolution,
         offset=chunk_begin,
         id_map=chunk_id_map,
         root_seg=None,

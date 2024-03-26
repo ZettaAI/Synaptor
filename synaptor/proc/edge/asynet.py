@@ -15,6 +15,7 @@ import pandas as pd
 from ...types import bbox
 from ... import seg_utils
 from .. import colnames as cn
+from ..anchor import anchor
 from . import locs
 from . import score
 from . import assign
@@ -33,6 +34,7 @@ def infer_edges(
     cleft,
     seg,
     patchsz,
+    voxel_res,
     root_seg=None,
     offset=(0, 0, 0),
     cleft_ids=None,
@@ -61,6 +63,7 @@ def infer_edges(
 
     cleft_locs = locs.pick_cleft_locs(cleft, cleft_ids, loc_type,
                                       samples_per_cleft, patchsz)
+    cleft_bboxes = seg_utils.bounding_boxes(cleft)
 
     # whether or not we should record watershed ids
     record_basins = root_seg is not None
@@ -71,10 +74,8 @@ def infer_edges(
         wt_sums = dict()
         wt_avgs = dict()
         seg_szs = dict()
-        seg_locs = dict()
         for loc in cid_locs:
             box = bbox.containing_box(loc, patchsz, cleft.shape)
-            box_offset = box.min() + offset
 
             img_p, clf_p, seg_p = get_patches(img, cleft, seg, box, cid)
 
@@ -94,10 +95,6 @@ def infer_edges(
             seg_szs = dict_sum(seg_szs, new_szs)
             wt_avgs = update_avgs(wt_sums, seg_szs)
 
-            new_locs = random_locs(seg_p[0, 0, :].transpose((2, 1, 0)),
-                                   segids, offset=box_offset)
-            seg_locs = update_locs(new_locs, seg_locs)
-
         if len(wt_sums) == 0:  # hallucinated synapse - or no segmentation
             print(f"skipping {cid}, no segs")
             continue
@@ -114,8 +111,28 @@ def infer_edges(
 
         for a in assignments:
             pre_seg, post_seg, pre_w, post_w = a
-            pre_loc, post_loc = seg_locs[pre_seg], seg_locs[post_seg]
-            pre_sz,  post_sz = seg_szs[pre_seg],  seg_szs[post_seg]
+            bb = cleft_bboxes[cid]
+            pre_loc = anchor.place_anchor_pt(
+                cid,
+                pre_seg,
+                cleft,
+                seg,
+                bb=bb,
+                voxel_res=voxel_res,
+                min_box_width=patchsz,
+                offset=offset,
+            )
+            post_loc = anchor.place_anchor_pt(
+                cid,
+                post_seg,
+                cleft,
+                seg,
+                bb=bb,
+                voxel_res=voxel_res,
+                min_box_width=patchsz,
+                offset=offset,
+            )
+            pre_sz, post_sz = seg_szs[pre_seg], seg_szs[post_seg]
 
             if record_basins:
                 pre_basin = pull_root(root_seg, pre_loc, offset)
