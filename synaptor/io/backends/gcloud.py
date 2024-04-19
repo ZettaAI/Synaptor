@@ -32,7 +32,7 @@ def pull_file(remote_path, alwayspull=False):
 
 
 def pull_files(remote_paths, dest=".", check=True,
-               batching_limit=50000, batch_size=1000):
+               batching_limit=10000, batch_size=1000):
 
     if len(remote_paths) > batching_limit:
         return pull_files_in_batches(remote_paths, dest, batch_size)
