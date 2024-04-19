@@ -20,6 +20,9 @@ BOTOPATH = os.path.join(HOME, ".boto")
 
 def gcloud_configured():
     """Tests whether gcloud permissions are set by trying gsutil."""
+    if not os.path.isfile(GCPPATH):
+        return False
+
     projectid = read_gcp_project()
 
     cmd = "gsutil ls"
@@ -36,8 +39,9 @@ def writeboto() -> None:
     awskeys = read_aws_keys() if os.path.isfile(AWSPATH) else None
     projectid = read_gcp_project() if os.path.isfile(GCPPATH) else None
 
-    if not os.path.isfile(BOTOPATH):
-        _writeboto(BOTOPATH, awskeys, projectid)
+    if awskeys or projectid:
+        if not os.path.isfile(BOTOPATH):
+            _writeboto(BOTOPATH, awskeys, projectid)
 
 
 def read_aws_keys(path: str = AWSPATH):
