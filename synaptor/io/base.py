@@ -6,6 +6,7 @@ Nicholas Turner <nturner@cs.princeton.edu>, 2018
 import os
 import warnings
 from functools import wraps
+from functools import cache
 
 from taskqueue import queueable
 
@@ -139,6 +140,7 @@ def send_directory(local_dir, path):
         bck.local.send_directory(local_dir, path)
 
 
+@cache
 def read_dframe(path_or_head, basename=None, chunksize=None):
     """
     Reads a dataframe - path can specify remote
