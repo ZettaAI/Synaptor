@@ -30,6 +30,8 @@ case $1 in
     dedup_chunk_segs) /usr/bin/env python -u base/dedup_chunk_segs.py ${@:2} ;;
     init_db)          /usr/bin/env python -u base/init_db.py ${@:2} ;;
     init_cloudvols)   /usr/bin/env python -u base/init_cloudvols.py ${@:2} ;;
+    index_seg_map)    /usr/bin/env python -u base/index_seg_map.py ${@:2} ;;
+    index_chunked_seg_map)    /usr/bin/env python -u base/index_chunked_seg_map.py ${@:2} ;;
     sanity_check)     /usr/bin/env python -u base/sanity_check.py ${@:2} ;;
 
     # worker
