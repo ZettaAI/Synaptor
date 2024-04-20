@@ -5,20 +5,15 @@ Chunk Segmentation Merging Map Wrapper Script
 - Makes an id mapping that merges the matching continuations within each chunk
 """
 import synaptor as s
-
-
+from synaptor.cloud import parser
 import argparse
-parser = argparse.ArgumentParser()
 
 
-parser.add_argument("storagestr")
-
-parser.add_argument("--timing_tag", default=None)
-
-
-args = parser.parse_args()
-args.storagestr = s.io.parse_storagestr(args.storagestr)
-print(vars(args))
+ap = argparse.ArgumentParser()
+ap.add_argument("configfilename", type=str, help="Path to the configuration file.")
+args = ap.parse_args()
+config = parser.parse(args.configfilename)
+connstr = s.io.parse_storagestr(config["connectionstr"])
 
 
-s.proc.tasks_w_io.chunk_seg_merge_map(**vars(args))
+s.proc.tasks_w_io.chunk_seg_merge_map(connstr, timing_tag=None)
