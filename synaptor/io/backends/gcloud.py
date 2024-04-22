@@ -8,6 +8,7 @@ import subprocess
 
 import cloudvolume  # Piggybacking on cloudvolume's secrets
 from google.cloud import storage
+from secrets import token_hex
 
 from . import utils
 
@@ -19,7 +20,7 @@ CREDS_FN = cloudvolume.secrets.google_credentials
 def pull_file(remote_path, alwayspull=False):
     bucket, key = parse_remote_path(remote_path)
 
-    local_fname = os.path.basename(remote_path)
+    local_fname = os.path.basename(remote_path)+token_hex(4)
 
     if not alwayspull and os.path.isfile(local_fname):
         return local_fname
