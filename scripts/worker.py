@@ -7,6 +7,10 @@ from __future__ import annotations
 import argparse
 from typing import Optional
 
+import concurrent.futures
+import multiprocessing
+import os
+
 from taskqueue import TaskQueue
 from kombuworker import taskqueueworker as tqw
 
@@ -54,4 +58,14 @@ if __name__ == "__main__":
     if not boto.gcloud_configured():
         boto.writeboto()
 
-    main(**vars(args))
+    max_workers = 3
+
+    futures = []
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers, mp_context=multiprocessing.get_context("spawn")) as executor:
+        futures += [executor.submit(main, **vars(args)) for _ in range(max_workers)]
+
+    for future in futures:
+        try:
+            print(future.result())
+        except Exception as e:
+            raise e
