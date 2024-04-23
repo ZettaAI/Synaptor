@@ -19,13 +19,13 @@ def connected_components(d, thresh=0, overlap_seg=None, dtype=np.uint32):
     if overlap_seg is None:
         # C-order speeds up continuation extraction by a LOT
         mask = np.ascontiguousarray(mask)
-        return cc3d.connected_components(mask, connectivity=6).astype(dtype)
+        return cc3d.connected_components(mask, connectivity=26).astype(dtype)
 
     else:
         temp = np.zeros(d.shape, dtype=overlap_seg.dtype, order='C')
         temp[mask] = overlap_seg[mask]
 
-        return cc3d.connected_components(temp, connectivity=6).astype(dtype)
+        return cc3d.connected_components(temp, connectivity=26).astype(dtype)
 
 
 
