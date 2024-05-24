@@ -187,6 +187,6 @@ def get_sources(parsed: dict):
     elif workflowtype == "Segmentation+Assignment":
         return [parsed["descriptor"], parsed["image"], parsed["baseseg"]]
     elif workflowtype == "Assignment":
-        return [parsed["output"], parsed["image"], parsed["baseseg"]]
+        return [parsed["image"], parsed["baseseg"]]
     else:
         raise ValueError(f"Unknown workflowtype: {workflowtype}")
