@@ -10,7 +10,7 @@ from configparser import ConfigParser
 from .. import io
 
 
-SUPPORTED_WORKFLOWS = ["Segmentation", "Segmentation+Assignment"]
+SUPPORTED_WORKFLOWS = ["Segmentation", "Segmentation+Assignment", "Assignment"]
 SUPPORTED_WORKSPACES = ["Database", "File"]
 
 
@@ -186,5 +186,7 @@ def get_sources(parsed: dict):
         return [parsed["descriptor"]]
     elif workflowtype == "Segmentation+Assignment":
         return [parsed["descriptor"], parsed["image"], parsed["baseseg"]]
+    elif workflowtype == "Assignment":
+        return [parsed["output"], parsed["image"], parsed["baseseg"]]
     else:
         raise ValueError(f"Unknown workflowtype: {workflowtype}")
