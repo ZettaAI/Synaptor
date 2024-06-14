@@ -267,8 +267,6 @@ def edge_task(
         root_seg=root_seg,
         dil_param=dil_param,
         restrict_segments=restrict_segments,
-        assign_type="single thresh",
-        thresh=0.5
     )
 
     edges = timed(
