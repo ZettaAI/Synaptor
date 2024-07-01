@@ -38,10 +38,6 @@ spec:
           mountPath: /root/.cloudvolume/secrets/aws-secret.json
           readOnly: true
           subPath: aws-secret.json
-        - name: secrets
-          mountPath: /root/.cloudvolume/secrets/tigerdata-secret.json
-          readOnly: true
-          subPath: tigerdata-secret.json
         - name: storagestr
 # UNCOMMENT THIS IF YOU USE A DATABASE CONNECTION STRING
 #           mountPath: /root/proc_url
