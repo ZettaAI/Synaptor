@@ -15,6 +15,7 @@ AWSKeys = namedtuple("AWSKeys", ["access_key_id", "secret_access_key"])
 HOME = os.path.expanduser("~")
 AWSPATH = os.path.join(HOME, ".cloudvolume/secrets", "aws-secret.json")
 GCPPATH = os.path.join(HOME, ".cloudvolume/secrets", "google-secret.json")
+TDPATH = os.path.join(HOME, ".cloudvolume/secrets", "tigerdata-secret.json")
 BOTOPATH = os.path.join(HOME, ".boto")
 
 
