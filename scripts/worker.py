@@ -6,10 +6,10 @@ from __future__ import annotations
 
 import argparse
 from typing import Optional
+from time import sleep
 
 import concurrent.futures
 import multiprocessing
-import os
 
 from taskqueue import TaskQueue
 from kombuworker import taskqueueworker as tqw
@@ -64,8 +64,10 @@ if __name__ == "__main__":
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers, mp_context=multiprocessing.get_context("spawn")) as executor:
         futures += [executor.submit(main, **vars(args)) for _ in range(max_workers)]
 
-    for future in futures:
-        try:
-            print(future.result())
-        except Exception as e:
-            raise e
+    while True:
+        sleep(5)
+        for future in futures:
+            if future.done():
+                e = future.exception()
+                if e:
+                    raise e

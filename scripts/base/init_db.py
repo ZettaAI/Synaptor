@@ -4,8 +4,10 @@ import argparse
 from synaptor.cloud import parser
 from synaptor.io import parse_storagestr
 from synaptor.proc.io import initdb
+import tenacity
 
 
+@tenacity.retry(wait=tenacity.wait_exponential(multiplier=1, min=10, max=120), stop=tenacity.stop_after_attempt(10))
 def main(configfilename: str) -> None:
 
     config = parser.parse(configfilename)
