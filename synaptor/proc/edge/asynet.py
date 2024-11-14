@@ -38,7 +38,7 @@ def infer_edges(
     root_seg=None,
     offset=(0, 0, 0),
     cleft_ids=None,
-    dil_param=5,
+    dil_param=2,
     loc_type="centroid",
     samples_per_cleft=None,
     score_type="avg",
