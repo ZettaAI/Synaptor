@@ -41,7 +41,7 @@ def infer_edges(
     dil_param=2,
     loc_type="centroid",
     samples_per_cleft=None,
-    score_type="avg",
+    score_type="sum",
     alpha=1,
     pre_type=None,
     post_type=None,
