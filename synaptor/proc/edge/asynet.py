@@ -41,7 +41,7 @@ def infer_edges(
     dil_param=2,
     loc_type="centroid",
     samples_per_cleft=None,
-    score_type="sum",
+    score_type="avg",
     alpha=1,
     pre_type=None,
     post_type=None,
@@ -389,7 +389,8 @@ def infer_patch(net, img_p, psd_p):
             raw_output = to_tensor(raw_output, volatile=True)
 
         print("sigmoid")
-        output = torch.sigmoid(raw_output)
+        # output = torch.sigmoid(raw_output)
+        output = raw_output
 
     return output
 
