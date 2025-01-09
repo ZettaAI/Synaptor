@@ -390,9 +390,9 @@ def infer_patch(net, img_p, psd_p):
 
         print("sigmoid")
         # output = torch.sigmoid(raw_output)
-        output = raw_output
+        print(torch.min(raw_output), torch.max(raw_output))
 
-    return output
+    return raw_output
 
 
 def seg_weights(output, seg, segids=None):
