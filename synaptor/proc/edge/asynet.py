@@ -388,9 +388,8 @@ def infer_patch(net, img_p, psd_p):
         if not net_takes_torch_tensors:
             raw_output = to_tensor(raw_output, volatile=True)
 
-        print("sigmoid")
+        # print("sigmoid")
         # output = torch.sigmoid(raw_output)
-        print(torch.min(raw_output), torch.max(raw_output))
 
     return raw_output
 
