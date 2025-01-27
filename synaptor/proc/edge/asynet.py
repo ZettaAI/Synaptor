@@ -84,7 +84,7 @@ def infer_edges(
             else:
                 segids = seg_utils.nonzero_unique_ids.unique(seg_p)
 
-            if len(segids) == 0:
+            if len(segids) <= 1:
                 print(f"skipping {cid}, no close segments")
                 continue
 
