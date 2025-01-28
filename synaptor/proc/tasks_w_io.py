@@ -453,7 +453,7 @@ def edge_task(
     storagestr,
     samples_per_cleft=2,
     restrict_segments=True,
-    dil_param=5,
+    dil_param=2,
     root_seg_cvname=None,
     resolution=(4, 4, 40),
     num_downsamples=0,
