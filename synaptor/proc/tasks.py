@@ -231,7 +231,7 @@ def edge_task(
     offset=(0, 0, 0),
     root_seg=None,
     samples_per_cleft=2,
-    dil_param=5,
+    dil_param=2,
     id_map=None,
     num_merge_tasks=None,
     hash_fillval=-1,
