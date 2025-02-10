@@ -82,7 +82,7 @@ def infer_edges(
             if restrict_segments:
                 segids = find_close_segments(clf_p, seg_p, dil_param)
             else:
-                segids = seg_utils.nonzero_unique_ids.unique(seg_p)
+                segids = seg_utils.nonzero_unique_ids(seg_p)
 
             if len(segids) <= 1:
                 print(f"skipping {cid}, no close segments")
@@ -312,9 +312,9 @@ def get_patches(img, psd, seg, box, psdid):
     seg_p = seg[box.index()]
 
     # transposing to fit net's conventions
-    img_p = img_p.transpose((2, 1, 0))
-    psd_p = psd_p.transpose((2, 1, 0))
-    seg_p = seg_p.transpose((2, 1, 0))
+    img_p = img_p.transpose((2, 0, 1))
+    psd_p = psd_p.transpose((2, 0, 1))
+    seg_p = seg_p.transpose((2, 0, 1))
 
     # add two dims to each for torch
     img_p = img_p[np.newaxis, np.newaxis, :]
@@ -376,6 +376,8 @@ def infer_patch(net, img_p, psd_p):
         # formatting
         print("concatenate")
         net_input = np.concatenate((img_p, psd_p), axis=1).astype("float32")
+        net_input = np.ascontiguousarray(net_input)
+        
         if net_takes_torch_tensors:
             net_input = to_tensor(net_input, volatile=True)
 
