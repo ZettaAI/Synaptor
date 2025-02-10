@@ -409,8 +409,9 @@ def seg_weights(output, seg, segids=None):
     weights = {}
     sizes = {}
 
-    presyn_output = output[0, ...]
-    postsyn_output = output[1, ...]
+    presyn_output = output[0, 1:-1, 3:-3, 3:-3]
+    postsyn_output = output[1, 1:-1, 3:-3, 3:-3]
+    seg = seg[1:-1, 3:-3, 3:-3]
 
     for i in segids:
 
