@@ -301,7 +301,8 @@ def random_locs(seg, segids, offset=(0, 0, 0)):
 
 
 def infer_patch_weights(net, img_p, psd_p, seg_p, segids=None):
-    return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
+    # return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
+    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids)
 
 
 def get_patches(img, psd, seg, box, psdid):
@@ -428,6 +429,39 @@ def seg_weights(output, seg, segids=None):
 
     return weights, sizes
 
+def seg_weights_withsyn(output, seg, psd, segids=None):
+    """
+    Finds the sum over the pre and post synaptic weights
+    contained in each segment of seg
+
+    output should be a torch.cuda Tensor, and
+    seg should be a numpy array
+    """
+
+    if segids is None:
+        segids = seg_utils.nonzero_unique_ids(seg)
+
+    weights = {}
+    sizes = {}
+
+    presyn_output = output[0, 1:-1, 3:-3, 3:-3]
+    postsyn_output = psd[0, 0, 1:-1, 3:-3, 3:-3]
+    seg = seg[:,:,1:-1, 3:-3, 3:-3]
+
+    for i in segids:
+
+        seg_mask = torch.from_numpy(
+                       (seg == i).astype("bool")).cuda()[0, 0, ...]
+        sizes[i] = torch.sum(seg_mask).item()
+
+        # pre_avg  = torch.sum(presyn_output[seg_mask]).item() / sizes[i]
+        # post_avg = torch.sum(postsyn_output[seg_mask]).item() / sizes[i]
+        pre_wt = torch.sum(presyn_output[seg_mask]).item()
+        post_wt = torch.sum(postsyn_output[seg_mask]).item()
+
+        weights[i] = (pre_wt, post_wt)
+
+    return weights, sizes
 
 def dict_tuple_avg(d1, s1, d2, s2):
     """
