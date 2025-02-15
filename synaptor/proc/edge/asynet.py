@@ -444,9 +444,9 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
     weights = {}
     sizes = {}
 
-    presyn_output = output[0, 1:-1, 3:-3, 3:-3]
-    postsyn_output = psd[0, 0, 1:-1, 3:-3, 3:-3]
-    seg = seg[:,:,1:-1, 3:-3, 3:-3]
+    presyn_output = output[0, ...]
+    postsyn_output = psd[0, 0, ...]
+    seg = seg[:, :, ...]
 
     for i in segids:
 
