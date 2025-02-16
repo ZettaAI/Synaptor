@@ -445,7 +445,7 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
     sizes = {}
 
     presyn_output = output[0, ...]
-    postsyn_output = psd[0, 0, ...]
+    postsyn_output = torch.from_numpy(psd).cuda()[0, 0, ...]
     seg = seg[:, :, ...]
 
     for i in segids:
