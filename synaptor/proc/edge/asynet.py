@@ -313,9 +313,9 @@ def get_patches(img, psd, seg, box, psdid):
     seg_p = seg[box.index()]
 
     # transposing to fit net's conventions
-    img_p = img_p.transpose((2, 1, 0))
-    psd_p = psd_p.transpose((2, 1, 0))
-    seg_p = seg_p.transpose((2, 1, 0))
+    img_p = img_p.transpose((2, 0, 1))
+    psd_p = psd_p.transpose((2, 0, 1))
+    seg_p = seg_p.transpose((2, 0, 1))
 
     # add two dims to each for torch
     img_p = img_p[np.newaxis, np.newaxis, :]
@@ -377,13 +377,13 @@ def infer_patch(net, img_p, psd_p):
         # formatting
         print("concatenate")
         net_input = np.concatenate((img_p, psd_p), axis=1).astype("float32")
+        net_input = np.ascontiguousarray(net_input)
         if net_takes_torch_tensors:
             net_input = to_tensor(net_input, volatile=True)
 
         # network has only one output
         # and batch size = 1
         print("forward pass")
-        print(net_input.shape)
         raw_output = net(net_input)[0][0, ...]
 
         if not net_takes_torch_tensors:
@@ -410,9 +410,8 @@ def seg_weights(output, seg, segids=None):
     weights = {}
     sizes = {}
 
-    presyn_output = output[0, 1:-1, 3:-3, 3:-3]
-    postsyn_output = output[1, 1:-1, 3:-3, 3:-3]
-    seg = seg[:,:,1:-1, 3:-3, 3:-3]
+    presyn_output = output[0, ...]
+    postsyn_output = output[1, ...]
 
     for i in segids:
 
@@ -446,7 +445,6 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
 
     presyn_output = output[0, ...]
     postsyn_output = torch.from_numpy(psd).cuda()[0, 0, ...]
-    seg = seg[:, :, ...]
 
     for i in segids:
 
@@ -458,6 +456,9 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
         # post_avg = torch.sum(postsyn_output[seg_mask]).item() / sizes[i]
         pre_wt = torch.sum(presyn_output[seg_mask]).item()
         post_wt = torch.sum(postsyn_output[seg_mask]).item()
+
+        if post_wt>0:
+            pre_wt = torch.tensor(0)
 
         weights[i] = (pre_wt, post_wt)
 
