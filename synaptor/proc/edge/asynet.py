@@ -389,8 +389,6 @@ def infer_patch(net, img_p, psd_p):
         if not net_takes_torch_tensors:
             raw_output = to_tensor(raw_output, volatile=True)
 
-        # print("sigmoid")
-        # output = torch.sigmoid(raw_output)
 
     return raw_output
 
@@ -457,8 +455,8 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
         pre_wt = torch.sum(presyn_output[seg_mask]).item()
         post_wt = torch.sum(postsyn_output[seg_mask]).item()
 
-        if post_wt>0:
-            pre_wt = torch.tensor(0)
+        # if post_wt>0:
+        #     pre_wt = torch.tensor(0)
 
         weights[i] = (pre_wt, post_wt)
 
