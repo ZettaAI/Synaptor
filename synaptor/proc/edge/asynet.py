@@ -301,8 +301,8 @@ def random_locs(seg, segids, offset=(0, 0, 0)):
 
 
 def infer_patch_weights(net, img_p, psd_p, seg_p, segids=None):
-    # return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
-    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids)
+    return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
+    # return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids)
 
 
 def get_patches(img, psd, seg, box, psdid):
