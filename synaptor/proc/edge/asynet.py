@@ -48,7 +48,8 @@ def infer_edges(
     assign_type="max",
     thresh=None,
     thresh2=None,
-    restrict_segments=True
+    restrict_segments=True,
+    synapsetype="Cleft"
 ):
     """
     Runs a trained network over the synaptic clefts within the dataset
@@ -88,8 +89,12 @@ def infer_edges(
                 print(f"skipping {cid}, no close segments")
                 continue
 
-            new_weights, new_szs = infer_patch_weights(net, img_p, clf_p,
-                                                       seg_p, segids)
+            if synapsetype=="Cleft":
+                new_weights, new_szs = infer_patch_weights(net, img_p, clf_p,
+                                                           seg_p, segids)
+            elif synapsetype=="Postsyn":
+                new_weights, new_szs = infer_patch_weights_withsyn(net, img_p, clf_p,
+                                                                   seg_p, segids)
 
             wt_sums = dict_tuple_sum(new_weights, wt_sums)
             seg_szs = dict_sum(seg_szs, new_szs)
@@ -301,9 +306,10 @@ def random_locs(seg, segids, offset=(0, 0, 0)):
 
 
 def infer_patch_weights(net, img_p, psd_p, seg_p, segids=None):
-    # return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
+    return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
+    
+def infer_patch_weights_withsyn(net, img_p, psd_p, seg_p, segids=None):
     return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids)
-
 
 def get_patches(img, psd, seg, box, psdid):
     """ Return 5d patches specified by the bbox for use in torch """

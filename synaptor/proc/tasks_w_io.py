@@ -452,6 +452,7 @@ def edge_task(
     patchsz,
     storagestr,
     samples_per_cleft=2,
+    synapsetype="Cleft",
     restrict_segments=True,
     dil_param=2,
     root_seg_cvname=None,
@@ -598,6 +599,7 @@ def edge_task(
         restrict_segments=restrict_segments,
         dil_param=dil_param,
         num_merge_tasks=num_merge_tasks,
+        synapsetype=synapsetype
     )
 
     if num_downsamples > 0:

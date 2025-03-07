@@ -236,6 +236,7 @@ def edge_task(
     num_merge_tasks=None,
     hash_fillval=-1,
     restrict_segments=True,
+    synapsetype="Cleft"
 ):
     """
     -Applies an id map to a chunk (if passed)
@@ -267,6 +268,7 @@ def edge_task(
         root_seg=root_seg,
         dil_param=dil_param,
         restrict_segments=restrict_segments,
+        synapsetype=synapsetype
     )
 
     edges = timed(

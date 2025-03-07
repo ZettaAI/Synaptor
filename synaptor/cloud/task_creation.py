@@ -175,6 +175,7 @@ def create_chunk_edges_tasks(
     aggstartcoord: Optional[tuple[int, int, int]] = None,
     aggmaxmip: Optional[int] = 11,
     bboxes: Optional[list[Bbox]] = None,
+    synapsetype: Optional[str] = "Cleft"
 ):
     """ Only passing the required arguments for now """
 
@@ -202,6 +203,7 @@ def create_chunk_edges_tasks(
                     chunk_end,
                     patchsz,
                     storagestr,
+                    synapsetype=synapsetype,
                     restrict_segments=restrict_segments,
                     storagedir=storagedir,
                     resolution=resolution,
