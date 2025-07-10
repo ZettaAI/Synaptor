@@ -2,6 +2,7 @@ FROM ranlu/pytorch_base:2.2
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential git ca-certificates \
+        libjpeg-dev libpng-dev libtiff-dev libwebp-dev \
     && rm -rf /var/lib/apt/lists/* \
     && echo "[GoogleCompute]\nservice_account = default" > /etc/boto.cfg \
     && git clone -b jabae https://github.com/ZettaAI/Synaptor.git /Synaptor \
