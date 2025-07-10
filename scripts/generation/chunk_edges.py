@@ -46,7 +46,8 @@ def main(
         aggmaxmip=config["aggmaxmip"],
         aggstartcoord=config["startcoord"],
         bboxes=bboxes,
-        synapsetype=config["synapsetype"]
+        synapsetype=config["synapsetype"],
+        root_seg=config["rootseg"]
     )
 
     queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)
