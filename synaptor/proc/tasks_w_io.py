@@ -985,6 +985,7 @@ def merge_overlaps_task(storagestr, timing_tag=None):
         )
 
 
+@queueable
 def anchor_task(
     cleft_cvname,
     seg_cvname,

@@ -206,6 +206,7 @@ def create_chunk_edges_tasks(
                     storagestr,
                     synapsetype=synapsetype,
                     restrict_segments=restrict_segments,
+                    root_seg_cvname=root_seg,
                     storagedir=storagedir,
                     resolution=resolution,
                     modelpath=modelpath,
@@ -214,8 +215,7 @@ def create_chunk_edges_tasks(
                     aggchunksize=aggchunksize,
                     aggmaxmip=aggmaxmip,
                     aggstartcoord=aggstartcoord,
-                    num_merge_tasks=num_merge_tasks,
-                    root_seg_cvname=root_seg
+                    num_merge_tasks=num_merge_tasks
                 )
 
     return ChunkEdgesTaskIterator()

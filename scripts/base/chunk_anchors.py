@@ -18,7 +18,7 @@ parser.add_argument("--chunk_end", nargs="+", type=int, required=True)
 parser.add_argument("--parallel", type=int, default=1)
 parser.add_argument("--mip", nargs="+", type=int, default=(0,))
 parser.add_argument("--seg_mip", nargs="+", type=int, default=None)
-parser.add_argument("--wshed_cvname", default=None)
+parser.add_argument("--root_seg_cvname", default=None)
 parser.add_argument("--min_box_width", nargs="+",
                     type=int, default=(100, 100, 5))
 parser.add_argument("--voxel_res", nargs="+", type=int, default=(4, 4, 40))
