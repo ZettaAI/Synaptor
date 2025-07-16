@@ -13,7 +13,7 @@ from . import filenames as fn
 
 EDGE_INFO_COLUMNS = [cn.seg_id, cn.size, cn.presyn_id, cn.postsyn_id,
                      *cn.presyn_coord_cols, *cn.postsyn_coord_cols,
-                     cn.clefthash, cn.partnerhash]
+                     cn.clefthash, cn.partnerhash, cn.presyn_basin, cn.postsyn_basin]
 CHUNK_START_COLUMNS = [cn.chunk_tag, cn.chunk_bx, cn.chunk_by, cn.chunk_bz]
 
 
