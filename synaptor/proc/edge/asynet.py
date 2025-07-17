@@ -67,8 +67,7 @@ def infer_edges(
     cleft_bboxes = seg_utils.bounding_boxes(cleft)
 
     # whether or not we should record watershed ids
-    # record_basins = root_seg is not None
-    record_basins = True
+    record_basins = root_seg is not None
 
     edges = []  # list of dict records
     for (cid, cid_locs) in cleft_locs.items():
