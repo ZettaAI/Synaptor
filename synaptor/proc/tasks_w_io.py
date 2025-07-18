@@ -564,11 +564,11 @@ def edge_task(
 
     if root_seg_cvname is not None:
         roots = timed(
-            f"Reading root segmentation chunk at mip {seg_mip}",
+            f"Reading root segmentation chunk at {resolution}",
             io.read_cloud_volume_chunk,
             root_seg_cvname,
             chunk_bounds,
-            resolution=seg_mip,
+            resolution=resolution,
             parallel=parallel,
         )
         assert roots.shape == seg.shape, "mismatched root segmentation"
