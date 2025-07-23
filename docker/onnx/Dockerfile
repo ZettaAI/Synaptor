@@ -7,8 +7,8 @@ RUN apt-get update \
     && git clone -b v1dd https://github.com/ZettaAI/Synaptor.git /Synaptor \
     &&  conda install -c conda-forge -c defaults \
         python-igraph h5py pandas \
-        scipy sqlalchemy \
-    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 cirrus-volume simplejpeg==1.7.6 pybind11 \
+        scipy pybind11 sqlalchemy \
+    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 cirrus-volume simplejpeg==1.7.6 \
     && pip install git+https://github.com/ZettaAI/kombu-worker \
     && pip install -e /Synaptor \
     && conda clean -t -p
