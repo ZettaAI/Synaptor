@@ -5,7 +5,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && echo "[GoogleCompute]\nservice_account = default" > /etc/boto.cfg \
     && git clone -b v1dd https://github.com/ZettaAI/Synaptor.git /Synaptor \
-    && pip install pybind11 \
+    && printf "[build-system]\nrequires = [\"setuptools\", \"wheel\", \"pybind11\"]\nbuild-backend = \"setuptools.build_meta\"\n" > /Synaptor/pyproject.toml \
     &&  conda install -c conda-forge -c defaults \
         python-igraph h5py pandas \
         scipy sqlalchemy \
