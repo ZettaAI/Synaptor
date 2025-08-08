@@ -13,10 +13,12 @@ from collections import namedtuple
 
 AWSKeys = namedtuple("AWSKeys", ["access_key_id", "secret_access_key"])
 TDKeys = namedtuple("TDKeys", ["access_key_id", "secret_access_key"])
+CAVEKeys = namedtuple("CAVEKeys", ["token"])
 HOME = os.path.expanduser("~")
 AWSPATH = os.path.join(HOME, ".cloudvolume/secrets", "aws-secret.json")
 GCPPATH = os.path.join(HOME, ".cloudvolume/secrets", "google-secret.json")
 TDPATH = os.path.join(HOME, ".cloudvolume/secrets", "tigerdata-secret.json")
+CAVEPATH = os.path.join(HOME, ".cloudvolume/secrets", "cave-secret.json")
 BOTOPATH = os.path.join(HOME, ".boto")
 
 
@@ -41,10 +43,11 @@ def writeboto() -> None:
     awskeys = read_aws_keys() if os.path.isfile(AWSPATH) else None
     projectid = read_gcp_project() if os.path.isfile(GCPPATH) else None
     tdkeys = read_td_keys() if os.path.isfile(TDPATH) else None
+    cavekeys = read_cave_keys() if os.path.isfile(CAVEPATH) else None
 
-    if awskeys or projectid or tdkeys:
+    if awskeys or projectid or tdkeys or cavekeys:
         if not os.path.isfile(BOTOPATH):
-            _writeboto(BOTOPATH, awskeys, projectid, tdkeys)
+            _writeboto(BOTOPATH, awskeys, projectid, tdkeys, cavekeys)
 
 
 def read_aws_keys(path: str = AWSPATH):
@@ -62,6 +65,13 @@ def read_td_keys(path: str = TDPATH):
 
     return TDKeys(content["AWS_ACCESS_KEY_ID"], content["AWS_SECRET_ACCESS_KEY"])
 
+def read_cave_keys(path: str = CAVEPATH):
+    """Reads the CAVE credential keys from the secret json file."""
+    with open(path) as f:
+        content = json.load(f)
+
+    return CAVEKeys(content["token"])
+
 
 def read_gcp_project(path: str = GCPPATH):
     """Reads the google cloud project name from the secret json file."""
@@ -71,17 +81,20 @@ def read_gcp_project(path: str = GCPPATH):
     return content["project_id"]
 
 
-def _writeboto(path: str, awskeys: AWSKeys, projectid: str, tdkeys: TDKeys) -> None:
+def _writeboto(path: str, awskeys: AWSKeys, projectid: str, tdkeys: TDKeys, cavekeys: CAVEKeys) -> None:
     with open(path, "w+") as f:
         f.write(dedent("[Credentials]\n\n"))
 
         if awskeys is not None:
             f.write(f"aws_access_key_id = {awskeys.access_key_id}\n\n")
-            f.write(f"aws_secret_acces_key = {awskeys.secret_access_key}\n\n")
+            f.write(f"aws_secret_access_key = {awskeys.secret_access_key}\n\n")
 
         if tdkeys is not None:
             f.write(f"aws_access_key_id = {tdkeys.access_key_id}\n\n")
-            f.write(f"aws_secret_acces_key = {tdkeys.secret_access_key}\n\n")
+            f.write(f"aws_secret_access_key = {tdkeys.secret_access_key}\n\n")
+
+        if cavekeys is not None:
+            f.write(f"cave_token = {cavekeys.token}\n\n")
 
         f.write(f"gs_service_key_file = {GCPPATH}\n\n")
 
