@@ -576,11 +576,11 @@ def edge_task(
     #     roots = None
 
     roots = timed(
-        f"Reading root segmentation chunk at mip {seg_mip}",
+        f"Reading root segmentation chunk at mip {resolution}",
         io.read_cloud_volume_chunk,
         root_seg_cvname,
         chunk_bounds,
-        resolution=seg_mip,
+        resolution=resolution,
         parallel=parallel,
     )
 
@@ -1061,11 +1061,11 @@ def anchor_task(
     #     roots = None
         
     roots = timed(
-        f"Reading root segmentation chunk at mip {seg_mip}",
+        f"Reading root segmentation chunk at mip {resolution}",
         io.read_cloud_volume_chunk,
         root_seg_cvname,
         chunk_bounds,
-        resolution=seg_mip,
+        resolution=resolution,
         parallel=parallel,
     )
 
