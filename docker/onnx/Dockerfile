@@ -11,7 +11,7 @@ RUN apt-get update \
     && pip install git+https://github.com/ZettaAI/cirrus-volume \
     && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 simplejpeg==1.7.6 \
     && pip install git+https://github.com/ZettaAI/kombu-worker \
-    && pip install -e /Synaptor \
+    && pip install -e /Synaptor --no-use-pep517 \
     && conda clean -t -p
 
 WORKDIR /Synaptor/scripts
