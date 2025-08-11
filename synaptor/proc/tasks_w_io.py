@@ -1065,7 +1065,7 @@ def anchor_task(
         io.read_cloud_volume_chunk,
         root_seg_cvname,
         chunk_bounds,
-        resolution=resolution,
+        resolution=seg_mip,
         parallel=parallel,
     )
 
