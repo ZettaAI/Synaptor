@@ -562,6 +562,19 @@ def edge_task(
             maxmip=aggmaxmip,
         )
 
+    if root_seg_cvname is not None:
+        roots = timed(
+            f"Reading root segmentation chunk at {resolution}",
+            io.read_cloud_volume_chunk,
+            root_seg_cvname,
+            chunk_bounds,
+            resolution=resolution,
+            parallel=parallel,
+        )
+        assert roots.shape == seg.shape, "mismatched root segmentation"
+    else:
+        roots = None
+
     assoc_net = timed(
         "Reading association network",
         taskio.read_network_from_proc,
@@ -594,7 +607,7 @@ def edge_task(
         voxel_res=resolution,
         offset=chunk_begin,
         id_map=chunk_id_map,
-        root_seg=None,
+        root_seg=roots,
         samples_per_cleft=samples_per_cleft,
         restrict_segments=restrict_segments,
         dil_param=dil_param,
@@ -985,6 +998,7 @@ def merge_overlaps_task(storagestr, timing_tag=None):
         )
 
 
+@queueable
 def anchor_task(
     cleft_cvname,
     seg_cvname,

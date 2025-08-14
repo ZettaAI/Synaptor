@@ -175,7 +175,8 @@ def create_chunk_edges_tasks(
     aggstartcoord: Optional[tuple[int, int, int]] = None,
     aggmaxmip: Optional[int] = 11,
     bboxes: Optional[list[Bbox]] = None,
-    synapsetype: Optional[str] = "Cleft"
+    synapsetype: Optional[str] = "Cleft",
+    root_seg: Optional[str] = None
 ):
     """ Only passing the required arguments for now """
 
@@ -205,6 +206,7 @@ def create_chunk_edges_tasks(
                     storagestr,
                     synapsetype=synapsetype,
                     restrict_segments=restrict_segments,
+                    root_seg_cvname=root_seg,
                     storagedir=storagedir,
                     resolution=resolution,
                     modelpath=modelpath,
@@ -213,7 +215,7 @@ def create_chunk_edges_tasks(
                     aggchunksize=aggchunksize,
                     aggmaxmip=aggmaxmip,
                     aggstartcoord=aggstartcoord,
-                    num_merge_tasks=num_merge_tasks,
+                    num_merge_tasks=num_merge_tasks
                 )
 
     return ChunkEdgesTaskIterator()

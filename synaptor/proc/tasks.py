@@ -449,5 +449,5 @@ def anchor_task(
         voxel_res=voxel_res,
         offset=chunk_begin,
         min_box_width=min_box_width,
-        root_seg=root_seg,
+        wshed=root_seg,
     )

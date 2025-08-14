@@ -12,7 +12,7 @@ from . import filenames as fn
 FULL_INFO_COLUMNS = [cn.seg_id, cn.presyn_id, cn.postsyn_id, cn.size,
                      *cn.centroid_cols, *cn.bbox_cols,
                      *cn.presyn_coord_cols, *cn.postsyn_coord_cols,
-                     cn.clefthash, cn.partnerhash]
+                     cn.clefthash, cn.partnerhash, cn.presyn_basin, cn.postsyn_basin]
 
 
 def read_full_info(proc_url):

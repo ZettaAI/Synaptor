@@ -7,7 +7,7 @@ RUN apt-get update \
     &&  conda install -c conda-forge -c defaults \
         python-igraph h5py pandas \
         scipy pybind11 sqlalchemy \
-    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 cirrus-volume \
+    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 cirrus-volume simplejpeg \
     && pip install git+https://github.com/ZettaAI/kombu-worker \
     && pip install -e /Synaptor \
     && conda clean -t -p

@@ -192,6 +192,9 @@ def init_edge_table(metadata, tablename, chunked=True):
                Column(cn.postsyn_x, Integer),
                Column(cn.postsyn_y, Integer),
                Column(cn.postsyn_z, Integer),
+               # Basin columns
+               Column(cn.presyn_basin, BigInteger),
+               Column(cn.postsyn_basin, BigInteger),
                # Hash values
                Column(cn.clefthash, Integer, default=-1, index=True),
                Column(cn.partnerhash, Integer, default=-1, index=True)]
@@ -230,6 +233,9 @@ def init_final_edge_table(metadata, tablename):
                  Column(cn.postsyn_x, Integer),
                  Column(cn.postsyn_y, Integer),
                  Column(cn.postsyn_z, Integer),
+                 # Basin columns
+                 Column(cn.presyn_basin, BigInteger),
+                 Column(cn.postsyn_basin, BigInteger),
                  # Hash values
                  Column(cn.clefthash, Integer, default=-1),
                  Column(cn.partnerhash, Integer, default=-1))
