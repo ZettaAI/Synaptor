@@ -241,6 +241,7 @@ def edge_task(
     score_type="sum",
     pre_type=None,
     post_type=None,
+    thresh=None
 ):
     """
     -Applies an id map to a chunk (if passed)
@@ -277,6 +278,7 @@ def edge_task(
         score_type=score_type,
         pre_type=pre_type,
         post_type=post_type,
+        thresh=thresh
     )
 
     edges = timed(

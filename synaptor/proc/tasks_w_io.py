@@ -457,6 +457,7 @@ def edge_task(
     score_type="sum",
     pre_type=None,
     post_type=None,
+    thresh=None,
     restrict_segments=True,
     dil_param=2,
     root_seg_cvname=None,
@@ -621,6 +622,7 @@ def edge_task(
         score_type=score_type,
         pre_type=pre_type,
         post_type=post_type,
+        thresh=thresh
     )
 
     if num_downsamples > 0:

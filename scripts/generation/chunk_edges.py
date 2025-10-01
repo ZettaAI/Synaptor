@@ -51,6 +51,7 @@ def main(
         score_type=config["score_type"],
         pre_type=config["pre_type"],
         post_type=config["post_type"],
+        thresh=config["assignthresh"],
         root_seg=config["rootseg"]
     )
 

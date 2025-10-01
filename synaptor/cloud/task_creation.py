@@ -180,6 +180,7 @@ def create_chunk_edges_tasks(
     score_type: Optional[str] = "sum",
     pre_type: Optional[str] = None,
     post_type: Optional[str] = None,
+    thresh: Optional[float] = None,
     root_seg: Optional[str] = None
 ):
     """ Only passing the required arguments for now """
@@ -213,6 +214,7 @@ def create_chunk_edges_tasks(
                     score_type=score_type,
                     pre_type=pre_type,
                     post_type=post_type,
+                    thresh=thresh,
                     restrict_segments=restrict_segments,
                     root_seg_cvname=root_seg,
                     storagedir=storagedir,

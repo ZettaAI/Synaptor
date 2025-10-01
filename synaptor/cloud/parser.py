@@ -71,6 +71,7 @@ def parse(filename: str):
     parsed["score_type"] = section.get("scoretype", "sum")
     parsed["pre_type"] = section.get("prescoretype", None)
     parsed["post_type"] = section.get("postscoretype", None)
+    parsed["assignthresh"] = float(section.get("assignthresh", 0.2))
     parsed["modelpath"] = section.get("modelpath", None)
     parsed["workflowtype"] = section.get("workflowtype", "Segmentation")
     parsed["workspacetype"] = section.get("workspacetype", "File")
