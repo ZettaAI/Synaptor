@@ -95,10 +95,10 @@ def infer_edges(
                                                            seg_p, segids)
             elif synapsetype=="Postsyn":
                 new_weights, new_szs = infer_patch_weights_withsyn(net, img_p, clf_p,
-                                                                   seg_p, type="post", segids)
+                                                                   seg_p, segids, type="post")
             elif synapsetype=="Presyn":
                 new_weights, new_szs = infer_patch_weights_withsyn(net, img_p, clf_p,
-                                                                   seg_p, type="pre", segids)
+                                                                   seg_p, segids, type="pre")
             else:
                 raise ValueError(f"Invalid synapsetype: {synapsetype}")
 
@@ -436,7 +436,7 @@ def seg_weights(output, seg, segids=None):
 
     return weights, sizes
 
-def seg_weights_withsyn(output, seg, psd, type="post", segids=None):
+def seg_weights_withsyn(output, seg, psd, segids=None, type="post"):
     """
     Finds the sum over the pre and post synaptic weights
     contained in each segment of seg
