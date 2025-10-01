@@ -47,6 +47,10 @@ def main(
         aggstartcoord=config["startcoord"],
         bboxes=bboxes,
         synapsetype=config["synapsetype"],
+        assign_type=config["assign_type"],
+        score_type=config["score_type"],
+        pre_type=config["pre_type"],
+        post_type=config["post_type"],
         root_seg=config["rootseg"]
     )
 

@@ -4,7 +4,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential git ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && echo "[GoogleCompute]\nservice_account = default" > /etc/boto.cfg \
-    && git clone -b svx https://github.com/ZettaAI/Synaptor.git /Synaptor \
+    && git clone -b multiseg https://github.com/ZettaAI/Synaptor.git /Synaptor \
     &&  conda install -c conda-forge -c defaults \
         python-igraph h5py pandas \
         scipy pybind11 sqlalchemy \

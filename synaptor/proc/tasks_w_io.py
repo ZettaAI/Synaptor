@@ -453,6 +453,10 @@ def edge_task(
     storagestr,
     samples_per_cleft=2,
     synapsetype="Cleft",
+    assign_type="max",
+    score_type="sum",
+    pre_type=None,
+    post_type=None,
     restrict_segments=True,
     dil_param=2,
     root_seg_cvname=None,
@@ -612,7 +616,11 @@ def edge_task(
         restrict_segments=restrict_segments,
         dil_param=dil_param,
         num_merge_tasks=num_merge_tasks,
-        synapsetype=synapsetype
+        synapsetype=synapsetype,
+        assign_type=assign_type,
+        score_type=score_type,
+        pre_type=pre_type,
+        post_type=post_type,
     )
 
     if num_downsamples > 0:

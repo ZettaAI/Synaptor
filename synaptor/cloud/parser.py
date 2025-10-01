@@ -12,7 +12,7 @@ from .. import io
 
 SUPPORTED_WORKFLOWS = ["Segmentation", "Segmentation+Assignment", "Assignment"]
 SUPPORTED_WORKSPACES = ["Database", "File"]
-SUPPORTED_SYNAPSETYPES = ["Cleft", "Postsyn"]
+SUPPORTED_SYNAPSETYPES = ["Cleft", "Postsyn", "Presyn"]
 
 
 def parse(filename: str):
@@ -29,6 +29,7 @@ def parse(filename: str):
 
     assert to_parse["Workflow"]["workflowtype"] in SUPPORTED_WORKFLOWS
     assert to_parse["Workflow"]["workspacetype"] in SUPPORTED_WORKSPACES
+    assert to_parse["Workflow"]["synapsetype"] in SUPPORTED_SYNAPSETYPES
 
     parsed = dict()
 
@@ -66,6 +67,10 @@ def parse(filename: str):
     # [Workflow]
     section = to_parse["Workflow"]
     parsed["synapsetype"] = section.get("synapsetype", "Cleft")
+    parsed["assign_type"] = section.get("assigntype", "max")
+    parsed["score_type"] = section.get("scoretype", "sum")
+    parsed["pre_type"] = section.get("prescoretype", None)
+    parsed["post_type"] = section.get("postscoretype", None)
     parsed["modelpath"] = section.get("modelpath", None)
     parsed["workflowtype"] = section.get("workflowtype", "Segmentation")
     parsed["workspacetype"] = section.get("workspacetype", "File")

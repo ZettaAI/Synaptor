@@ -95,7 +95,12 @@ def infer_edges(
                                                            seg_p, segids)
             elif synapsetype=="Postsyn":
                 new_weights, new_szs = infer_patch_weights_withsyn(net, img_p, clf_p,
-                                                                   seg_p, segids)
+                                                                   seg_p, type="post", segids)
+            elif synapsetype=="Presyn":
+                new_weights, new_szs = infer_patch_weights_withsyn(net, img_p, clf_p,
+                                                                   seg_p, type="pre", segids)
+            else:
+                raise ValueError(f"Invalid synapsetype: {synapsetype}")
 
             wt_sums = dict_tuple_sum(new_weights, wt_sums)
             seg_szs = dict_sum(seg_szs, new_szs)
@@ -309,8 +314,8 @@ def random_locs(seg, segids, offset=(0, 0, 0)):
 def infer_patch_weights(net, img_p, psd_p, seg_p, segids=None):
     return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
     
-def infer_patch_weights_withsyn(net, img_p, psd_p, seg_p, segids=None):
-    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids)
+def infer_patch_weights_withsyn(net, img_p, psd_p, seg_p, type="post", segids=None):
+    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, type, segids)
 
 def get_patches(img, psd, seg, box, psdid):
     """ Return 5d patches specified by the bbox for use in torch """
@@ -424,8 +429,6 @@ def seg_weights(output, seg, segids=None):
                        (seg == i).astype("bool")).cuda()[0, 0, ...]
         sizes[i] = torch.sum(seg_mask).item()
 
-        # pre_avg  = torch.sum(presyn_output[seg_mask]).item() / sizes[i]
-        # post_avg = torch.sum(postsyn_output[seg_mask]).item() / sizes[i]
         pre_wt = torch.sum(presyn_output[seg_mask]).item()
         post_wt = torch.sum(postsyn_output[seg_mask]).item()
 
@@ -433,7 +436,7 @@ def seg_weights(output, seg, segids=None):
 
     return weights, sizes
 
-def seg_weights_withsyn(output, seg, psd, segids=None):
+def seg_weights_withsyn(output, seg, psd, type="post", segids=None):
     """
     Finds the sum over the pre and post synaptic weights
     contained in each segment of seg
@@ -448,8 +451,14 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
     weights = {}
     sizes = {}
 
-    presyn_output = output[0, ...]
-    postsyn_output = torch.from_numpy(psd).cuda()[0, 0, ...]
+    if type == "post":
+        presyn_output = output[0, ...]
+        postsyn_output = torch.from_numpy(psd).cuda()[0, 0, ...]
+    elif type == "pre":
+        presyn_output = torch.from_numpy(psd).cuda()[0, 0, ...]
+        postsyn_output = output[1, ...]
+    else:
+        raise ValueError(f"Invalid type: {type}")
 
     for i in segids:
 
@@ -457,13 +466,8 @@ def seg_weights_withsyn(output, seg, psd, segids=None):
                        (seg == i).astype("bool")).cuda()[0, 0, ...]
         sizes[i] = torch.sum(seg_mask).item()
 
-        # pre_avg  = torch.sum(presyn_output[seg_mask]).item() / sizes[i]
-        # post_avg = torch.sum(postsyn_output[seg_mask]).item() / sizes[i]
         pre_wt = torch.sum(presyn_output[seg_mask]).item()
         post_wt = torch.sum(postsyn_output[seg_mask]).item()
-
-        # if post_wt>0:
-        #     pre_wt = torch.tensor(0)
 
         weights[i] = (pre_wt, post_wt)
 

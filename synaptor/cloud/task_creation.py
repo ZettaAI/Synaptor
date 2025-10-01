@@ -176,6 +176,10 @@ def create_chunk_edges_tasks(
     aggmaxmip: Optional[int] = 11,
     bboxes: Optional[list[Bbox]] = None,
     synapsetype: Optional[str] = "Cleft",
+    assign_type: Optional[str] = "max",
+    score_type: Optional[str] = "sum",
+    pre_type: Optional[str] = None,
+    post_type: Optional[str] = None,
     root_seg: Optional[str] = None
 ):
     """ Only passing the required arguments for now """
@@ -205,6 +209,10 @@ def create_chunk_edges_tasks(
                     patchsz,
                     storagestr,
                     synapsetype=synapsetype,
+                    assign_type=assign_type,
+                    score_type=score_type,
+                    pre_type=pre_type,
+                    post_type=post_type,
                     restrict_segments=restrict_segments,
                     root_seg_cvname=root_seg,
                     storagedir=storagedir,

@@ -5,7 +5,7 @@ import operator
 import itertools
 
 
-IMPLEMENTED = ["max", "single thresh", "double thresh"]
+IMPLEMENTED = ["max", "single_thresh", "double_thresh", "pre_thresh", "post_thresh"]
 
 
 def make_assignments(pre_scores, post_scores, thresh=0, thresh2=0,
@@ -20,11 +20,17 @@ def make_assignments(pre_scores, post_scores, thresh=0, thresh2=0,
     if assign_type == "max":
         return assign_by_max(pre_scores, post_scores)
 
-    elif assign_type == "single thresh":
+    elif assign_type == "single_thresh":
         return assign_by_thresh(pre_scores, post_scores, thresh, thresh)
 
-    elif assign_type == "double thresh":
+    elif assign_type == "double_thresh":
         return assign_by_thresh(pre_scores, post_scores, thresh, thresh2)
+
+    elif assign_type == "pre_thresh":
+        return assign_by_thresh_pre(pre_scores, post_scores, thresh)
+
+    elif assign_type == "post_thresh":
+        return assign_by_thresh_post(pre_scores, post_scores, thresh)
 
 
 def assign_by_max(pre_scores, post_scores):
@@ -51,6 +57,48 @@ def assign_by_thresh(pre_scores, post_scores, pre_thresh, post_thresh):
         pre_segs, pre_scores = [max_pre_seg], [max_pre_score]
 
     post_segs, post_scores = all_over_thresh(post_scores.items(), post_thresh)
+
+    result = list()
+    for (i, j) in itertools.product(range(len(pre_segs)),
+                                    range(len(post_segs))):
+        result.append((pre_segs[i], post_segs[j],
+                       pre_scores[i], post_scores[j]))
+
+    return result
+
+
+def assign_by_thresh_pre(pre_scores, post_scores, thresh):
+    """
+    Assign presynaptic segment by thresholding and postsynaptic segment by max
+    """
+    # Presynaptic segment assignments by thresholding
+    pre_segs, pre_scores = all_over_thresh(pre_scores.items(), thresh)
+
+    # Postsynaptic segment assignment by max
+    max_post_seg, max_post_score = max(post_scores.items(),
+                                       key=operator.itemgetter(1))
+    post_segs, post_scores = [max_post_seg], [max_post_score]
+
+    result = list()
+    for (i, j) in itertools.product(range(len(pre_segs)),
+                                    range(len(post_segs))):
+        result.append((pre_segs[i], post_segs[j],
+                       pre_scores[i], post_scores[j]))
+
+    return result
+
+
+def assign_by_thresh_post(pre_scores, post_scores, thresh):
+    """
+    Assign presynaptic segment by max and postsynaptic segment by thresholding
+    """
+    # Presynaptic segment assignments by thresholding
+    max_pre_seg, max_pre_score = max(pre_scores.items(),
+                                     key=operator.itemgetter(1))
+    pre_segs, pre_scores = [max_pre_seg], [max_pre_score]
+
+    # Postsynaptic segment assignment by max
+    post_segs, post_scores = all_over_thresh(post_scores.items(), thresh)
 
     result = list()
     for (i, j) in itertools.product(range(len(pre_segs)),
