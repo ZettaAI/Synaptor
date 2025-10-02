@@ -9,7 +9,7 @@ RUN apt-get update \
         python-igraph h5py pandas \
         scipy pybind11 sqlalchemy \
     && pip install git+https://github.com/ZettaAI/cirrus-volume \
-    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 simplejpeg==1.7.6 setuptools==69.0.2 \
+    && pip --no-cache-dir install --upgrade gsutil task-queue==2.12.0 simplejpeg==1.7.6 setuptools==69.0.2 imagecodecs \
     && pip install git+https://github.com/ZettaAI/kombu-worker \
     && pip install -e /Synaptor \
     && conda clean -t -p
