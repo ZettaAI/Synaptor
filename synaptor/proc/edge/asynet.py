@@ -314,8 +314,8 @@ def random_locs(seg, segids, offset=(0, 0, 0)):
 def infer_patch_weights(net, img_p, psd_p, seg_p, segids=None):
     return seg_weights(infer_patch(net, img_p, psd_p), seg_p, segids)
     
-def infer_patch_weights_withsyn(net, img_p, psd_p, seg_p, type="post", segids=None):
-    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, type, segids)
+def infer_patch_weights_withsyn(net, img_p, psd_p, seg_p, segids=None, type="post"):
+    return seg_weights_withsyn(infer_patch(net, img_p, psd_p), seg_p, psd_p, segids, type)
 
 def get_patches(img, psd, seg, box, psdid):
     """ Return 5d patches specified by the bbox for use in torch """
