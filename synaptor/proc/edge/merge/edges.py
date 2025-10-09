@@ -17,7 +17,7 @@ def pick_largest_edges(df, indexname=cn.seg_id):
     df = df[df[cn.size] == df.groupby([indexname])[cn.size].transform(max)]
 
     # keeps the first row in the case of a tie (effectively random)
-    df = df.drop_duplicates(indexname)
+    # df = df.drop_duplicates(indexname)
 
     return df.set_index(indexname)
 
