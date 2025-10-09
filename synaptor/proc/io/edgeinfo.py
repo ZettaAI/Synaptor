@@ -75,22 +75,8 @@ def read_hashed_edge_info(proc_url, partnerhash=None,
 
     if dedup:
         raw_df = io.read_db_dframe(proc_url, statement)
-        # df = raw_df.loc[~raw_df[cn.seg_id].duplicated()]
-        # # Custom duplicate removal logic:
-        # # - Keep rows with same segment ID and same centroid (legitimate duplicates)
-        # # - Remove rows with same segment ID but different centroids (conflicting assignments)
+        df = raw_df.loc[~raw_df[cn.seg_id, cn.presyn_id, cn.postsyn_id].duplicated()]
         
-        # def remove_conflicting_assignments(group):
-        #     # Check if all centroids in this group are the same
-        #     centroids = group[cn.centroid_cols].drop_duplicates()
-        #     if len(centroids) == 1:
-        #         # All centroids are the same, keep all rows (legitimate duplicates)
-        #         return group
-        #     else:
-        #         # Centroids differ, keep only the first row (remove conflicting assignments)
-        #         return group.head(1)
-        
-        # df = raw_df.groupby(cn.seg_id).apply(remove_conflicting_assignments).reset_index(drop=True)
         return df.set_index(cn.seg_id)
     else:
         return io.read_db_dframe(proc_url, statement, index_col=cn.seg_id)
@@ -205,23 +191,9 @@ def read_merged_edge_info(proc_url):
         statement = select(columns)
 
         # Removing duplicates in case...
-        # Custom duplicate removal logic:
-        # - Keep rows with same segment ID and same centroid (legitimate duplicates)
-        # - Remove rows with same segment ID but different centroids (conflicting assignments)
         raw_df = io.read_db_dframe(proc_url, statement)
-        # df = raw_df.loc[~raw_df[cn.seg_id].duplicated()]
+        df = raw_df.loc[~raw_df[cn.seg_id, cn.presyn_id, cn.postsyn_id].duplicated()]
 
-        # def remove_conflicting_assignments(group):
-        #     # Check if all centroids in this group are the same
-        #     centroids = group[cn.centroid_cols].drop_duplicates()
-        #     if len(centroids) == 1:
-        #         # All centroids are the same, keep all rows (legitimate duplicates)
-        #         return group
-        #     else:
-        #         # Centroids differ, keep only the first row (remove conflicting assignments)
-        #         return group.head(1)
-        
-        # df = raw_df.groupby(cn.seg_id).apply(remove_conflicting_assignments).reset_index(drop=True)
         return df.set_index(cn.seg_id)
     else:
         return io.read_dframe(proc_url, fn.merged_edgeinfo_fname)
