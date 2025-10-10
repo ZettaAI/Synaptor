@@ -75,7 +75,8 @@ def read_hashed_edge_info(proc_url, partnerhash=None,
 
     if dedup:
         raw_df = io.read_db_dframe(proc_url, statement)
-        df = raw_df.loc[~raw_df[[cn.seg_id, cn.presyn_id, cn.postsyn_id]].duplicated()]
+        # df = raw_df.loc[~raw_df[[cn.seg_id, cn.presyn_id, cn.postsyn_id]].duplicated()]
+        df = raw_df
         
         return df.set_index(cn.seg_id)
     else:
@@ -192,7 +193,8 @@ def read_merged_edge_info(proc_url):
 
         # Removing duplicates in case...
         raw_df = io.read_db_dframe(proc_url, statement)
-        df = raw_df.loc[~raw_df[[cn.seg_id, cn.presyn_id, cn.postsyn_id]].duplicated()]
+        # df = raw_df.loc[~raw_df[[cn.seg_id, cn.presyn_id, cn.postsyn_id]].duplicated()]
+        df = raw_df
 
         return df.set_index(cn.seg_id)
     else:
