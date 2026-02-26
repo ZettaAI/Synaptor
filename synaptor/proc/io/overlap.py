@@ -119,6 +119,21 @@ def make_empty_df():
     return df.set_index(cn.seg_id)
 
 
+def read_seg_overlap_map(proc_url):
+    """Reads the mapping from global segment ID to overlap seg ID from chunk_segs."""
+    assert io.is_db_url(proc_url), "Not implemented for file IO"
+
+    metadata = io.open_db_metadata(proc_url)
+    chunk_segs = metadata.tables["chunk_segs"]
+
+    statement = select([chunk_segs.c["id"], chunk_segs.c[cn.ovl_segid]]).where(
+        chunk_segs.c[cn.ovl_segid].isnot(None)
+    )
+
+    df = io.read_db_dframe(proc_url, statement)
+    return dict(zip(df["id"], df[cn.ovl_segid]))
+
+
 def read_max_overlaps(proc_url):
     """
     Reads the mapping from segment to base segment of maximal overlap

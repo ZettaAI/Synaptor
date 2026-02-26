@@ -168,7 +168,11 @@ def match_continuations_task(
     return graph_edges
 
 
-def seg_graph_cc_task(graph_edges, num_merge_tasks, all_ids):
+def seg_graph_cc_task(graph_edges, num_merge_tasks, all_ids, overlap_map=None):
+    if overlap_map is not None:
+        graph_edges = [(a, b) for a, b in graph_edges
+                       if overlap_map.get(a) == overlap_map.get(b)]
+
     ccs = timed(
         "Finding connected components", utils.find_connected_components, graph_edges
     )
