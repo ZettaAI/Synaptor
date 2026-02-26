@@ -571,7 +571,6 @@ def edge_task(
             resolution=resolution,
             parallel=parallel,
         )
-        assert roots.shape == seg.shape, "mismatched root segmentation"
     else:
         roots = None
 
@@ -1047,7 +1046,6 @@ def anchor_task(
             resolution=seg_mip,
             parallel=parallel,
         )
-        assert roots.shape == seg.shape, "mismatched root segmentation"
     else:
         roots = None
 
