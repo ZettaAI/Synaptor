@@ -562,8 +562,19 @@ def edge_task(
             maxmip=aggmaxmip,
         )
 
-    if root_seg_cvname is not None:
-        roots = timed(
+    # if root_seg_cvname is not None:
+    #     roots = timed(
+    #         f"Reading root segmentation chunk at {resolution}",
+    #         io.read_cloud_volume_chunk,
+    #         root_seg_cvname,
+    #         chunk_bounds,
+    #         resolution=resolution,
+    #         parallel=parallel,
+    #     )
+    #     assert roots.shape == seg.shape, "mismatched root segmentation"
+    # else:
+    #     roots = None
+    roots = timed(
             f"Reading root segmentation chunk at {resolution}",
             io.read_cloud_volume_chunk,
             root_seg_cvname,
@@ -571,9 +582,6 @@ def edge_task(
             resolution=resolution,
             parallel=parallel,
         )
-        assert roots.shape == seg.shape, "mismatched root segmentation"
-    else:
-        roots = None
 
     assoc_net = timed(
         "Reading association network",
@@ -1038,8 +1046,19 @@ def anchor_task(
         parallel=parallel,
     )
 
-    if root_seg_cvname is not None:
-        roots = timed(
+    # if root_seg_cvname is not None:
+    #     roots = timed(
+    #         f"Reading root segmentation chunk at mip {seg_mip}",
+    #         io.read_cloud_volume_chunk,
+    #         root_seg_cvname,
+    #         chunk_bounds,
+    #         resolution=seg_mip,
+    #         parallel=parallel,
+    #     )
+    #     assert roots.shape == seg.shape, "mismatched root segmentation"
+    # else:
+    #     roots = None
+    roots = timed(
             f"Reading root segmentation chunk at mip {seg_mip}",
             io.read_cloud_volume_chunk,
             root_seg_cvname,
@@ -1047,9 +1066,6 @@ def anchor_task(
             resolution=seg_mip,
             parallel=parallel,
         )
-        assert roots.shape == seg.shape, "mismatched root segmentation"
-    else:
-        roots = None
 
     edge_df = timed("Reading full edge info", taskio.read_full_info, storagestr)
 
