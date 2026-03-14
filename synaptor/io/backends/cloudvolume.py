@@ -67,11 +67,10 @@ def write_cloud_volume_chunk(
         sources=sources,
         motivation=motivation,
         process=thisprocess,
+        bounded=False,
+        fill_missing=True,
+        delete_black_uploads=True,
     )
-
-    # ensuring that we always read something for non-aligned writes
-    cv.fill_missing = True
-    cv.bounded = False
 
     cv[bbox.index()] = data.astype(cv.dtype)
 
@@ -92,11 +91,12 @@ def init_seg_volume(
         1,  # num_channels
         "segmentation",  # layer_type
         "uint32",  # data_type
-        "raw",  # encoding
+        "compressed_segmentation",  # encoding
         resolution,
         offset,
         vol_shape,
         chunk_size=chunk_size,
+        compressed_segmentation_block_size=(8, 8, 8),
     )
 
     thisprocess = thisProcess(parameters)
@@ -107,7 +107,7 @@ def init_seg_volume(
         info=info,
         sources=sources,
         motivation=motivation,
-        process=thisprocess
+        process=thisprocess,
     )
 
     cv.commit_info()
