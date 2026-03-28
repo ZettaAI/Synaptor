@@ -40,6 +40,7 @@ from . import overlap
 from .overlap import read_chunk_overlap_mat, write_chunk_overlap_mat
 from .overlap import read_all_overlap_mats
 from .overlap import read_max_overlaps, write_max_overlaps
+from .overlap import read_seg_overlap_map
 
 from . import timing
 from .timing import read_task_timing, write_task_timing

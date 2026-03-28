@@ -53,6 +53,8 @@ def write_chunk_seg_info(dframe, proc_url, chunk_bounds):
 def prep_chunk_seg_info(dframe, chunk_bounds):
     chunk_tag = io.fname_chunk_tag(chunk_bounds)
     to_write = dframe.reset_index()[SEG_INFO_COLUMNS].copy()
+    if cn.ovl_segid in dframe.columns:
+        to_write[cn.ovl_segid] = dframe[cn.ovl_segid].values
     to_write[cn.chunk_tag] = chunk_tag
 
     return to_write, CHUNKED_TABLENAME

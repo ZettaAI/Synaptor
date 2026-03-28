@@ -21,7 +21,9 @@ def main(
     config = parser.parse(configfilename)
 
     task = tc.create_seg_graph_cc_task(
-        config["storagestrs"][0], config["nummergetasks"]
+        config["storagestrs"][0],
+        config["nummergetasks"],
+        enforce_overlaps=config["overlap_seg"] is not None,
     )
 
     queueurl = parser.parse_opt_if_not_passed("queueurl", queueurl, configfilename)

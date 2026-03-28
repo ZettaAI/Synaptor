@@ -109,7 +109,9 @@ def init_seg_table(metadata, tablename, segid_colname=cn.seg_id, chunked=True):
                Column(cn.bbox_bz, Integer),
                Column(cn.bbox_ex, Integer),
                Column(cn.bbox_ey, Integer),
-               Column(cn.bbox_ez, Integer)]
+               Column(cn.bbox_ez, Integer),
+               # Overlap seg id - None if no overlap or not tracked
+               Column(cn.ovl_segid, BigInteger, nullable=True)]
 
     if chunked:
         # Chunk id - None if merged across chunks

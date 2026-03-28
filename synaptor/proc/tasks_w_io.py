@@ -332,7 +332,10 @@ def match_continuations_task(
 
 @queueable
 def seg_graph_cc_task(
-    storagestr: str, num_merge_tasks: int, timing_tag: Optional[str] = None
+    storagestr: str,
+    num_merge_tasks: int,
+    timing_tag: Optional[str] = None,
+    enforce_overlaps: Optional[bool] = False,
 ) -> None:
 
     start_time = time.time()
@@ -345,7 +348,15 @@ def seg_graph_cc_task(
         "Reading all unique seg ids", taskio.read_all_unique_seg_ids, storagestr
     )
 
-    seg_merge_df = tasks.seg_graph_cc_task(graph_edges, num_merge_tasks, all_ids)
+    overlap_map = None
+    if enforce_overlaps:
+        overlap_map = timed(
+            "Reading seg overlap map", taskio.read_seg_overlap_map, storagestr
+        )
+
+    seg_merge_df = tasks.seg_graph_cc_task(
+        graph_edges, num_merge_tasks, all_ids, overlap_map=overlap_map
+    )
 
     timed("Writing seg merge_map", taskio.write_seg_merge_map, seg_merge_df, storagestr)
 

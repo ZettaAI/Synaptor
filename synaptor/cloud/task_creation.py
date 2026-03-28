@@ -113,8 +113,15 @@ def create_match_contins_tasks(
     return MatchContinsTaskIterator()
 
 
-def create_seg_graph_cc_task(storagestr: str, num_merge_tasks: int) -> partial:
-    return partial(tasks_w_io.seg_graph_cc_task, storagestr, num_merge_tasks)
+def create_seg_graph_cc_task(
+    storagestr: str, num_merge_tasks: int, enforce_overlaps: bool = False
+) -> partial:
+    return partial(
+        tasks_w_io.seg_graph_cc_task,
+        storagestr,
+        num_merge_tasks,
+        enforce_overlaps=enforce_overlaps,
+    )
 
 
 def create_index_seg_map_task(storagestr: str) -> partial:
